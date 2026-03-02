@@ -1,0 +1,42 @@
+name: release-operations
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release-dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run verify-release-artifacts
+      - run: npm run verify-changelog-version
+      - run: npm run verify-plugin-schema-contract
+      - run: npm run generate-release-artifacts
+      - run: npm run collect-security-evidence
+      - run: npm run generate-security-release-index
+      - run: npm run performance-benchmark
+      - run: npm run bundle-release-evidence
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-evidence-bundle
+          path: |
+            release-artifacts/checksums.sha256
+            release-artifacts/release-manifest.json
+            security-artifacts/security-summary.json
+            security-artifacts/SECURITY_RELEASE_INDEX.md
+            performance-artifacts/performance-benchmark.json
+            release-evidence/
+            dist/index.js
+            dist/cli.js
+            openclaw.plugin.json
+            attestation/trusted_mode_attest_v1.json
+            attestation/trusted_mode_attest_v1.sig

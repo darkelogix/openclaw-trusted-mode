@@ -1,0 +1,17 @@
+[
+  {
+    "openclaw_version": "2026.2.15",
+    "certification_status": "CERTIFIED_ENFORCED",
+    "notes": "Verified in current release cycle."
+  },
+  {
+    "openclaw_version": "2026.2.16",
+    "certification_status": "LOCKDOWN_ONLY",
+    "notes": "Config-writer version warning observed; certify before enforced claims."
+  },
+  {
+    "openclaw_version": "latest (rolling)",
+    "certification_status": "UNSUPPORTED",
+    "notes": "Treat as uncertified until CI certification completes."
+  }
+]

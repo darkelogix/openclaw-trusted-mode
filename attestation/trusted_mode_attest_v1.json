@@ -1,0 +1,21 @@
+{
+  "pack_id": "trusted_mode_attest",
+  "pack_version": "v1.0.0",
+  "schema_version": "2026-03-01",
+  "issued_at": "2026-03-01T00:00:00Z",
+  "checks": [
+    "attestation_pack_signature",
+    "deny_high_impact",
+    "allow_low_impact",
+    "signature_failure"
+  ],
+  "output_contract": {
+    "status_values": ["ENFORCED_OK", "LOCKDOWN_ONLY", "UNSAFE"],
+    "axis_scores": [
+      "interception_proof",
+      "fail_safe_posture",
+      "integrity",
+      "certified_compatibility"
+    ]
+  }
+}

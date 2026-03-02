@@ -1,0 +1,52 @@
+{
+  "name": "openclaw-trusted-mode",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "bin": {
+    "trusted-mode-check": "dist/cli.js"
+  },
+  "openclaw": {
+    "extensions": [
+      "dist/index.js"
+    ]
+  },
+  "files": [
+    "dist/",
+    "attestation/",
+    "openclaw.plugin.json",
+    "openclaw.user-config.entry.example.json",
+    "README.md",
+    "START_HERE.md",
+    "GLOSSARY.md",
+    "SELF_SERVICE_FAQ.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "vitest run",
+    "verify-release-artifacts": "node scripts/verify_release_artifacts.js",
+    "verify-changelog-version": "node scripts/verify_changelog_version.js",
+    "generate-release-artifacts": "node scripts/generate_release_artifacts.js",
+    "collect-security-evidence": "node scripts/collect_security_evidence.js",
+    "generate-third-party-notices": "node scripts/generate_third_party_notices.js",
+    "generate-security-release-index": "node scripts/generate_security_release_index.js",
+    "verify-security-gates": "node scripts/verify_security_gates.js",
+    "verify-plugin-schema-contract": "node scripts/verify_plugin_schema_contract.js",
+    "bundle-release-evidence": "node scripts/bundle_release_evidence.js",
+    "adversarial-check": "node scripts/run_adversarial_checks.js",
+    "startup-health-check": "node scripts/verify_startup_health.js",
+    "performance-benchmark": "node scripts/run_performance_benchmark.js",
+    "test-pack-matrix": "python scripts/run_test_pack_matrix.py",
+    "update-compatibility-matrix": "node scripts/update_compatibility_matrix.js",
+    "verify-compatibility-matrix": "node scripts/update_compatibility_matrix.js --check",
+    "trusted-mode-check": "node dist/cli.js",
+    "trusted-mode-check:mock": "node scripts/mock_pdp.js",
+    "lint-docs-terminology": "python scripts/lint_docs_terminology.py"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.18"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "plugins": {
+    "entries": {
+      "openclaw-trusted-mode": {
+        "enabled": true,
+        "config": {
+          "pdpUrl": "http://localhost:8001/v1/authorize",
+          "policyVariant": "guard-pro.v2026.02",
+          "pdpTimeoutMs": 5000,
+          "failClosed": true,
+          "tenantId": "trial-tenant",
+          "toolPolicyMode": "PDP",
+          "requireTenantId": true,
+          "allowedTenantIds": ["trial-tenant"]
+        }
+      }
+    }
+  }
+}

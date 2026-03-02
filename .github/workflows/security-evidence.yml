@@ -1,0 +1,36 @@
+name: security-evidence
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: mkdir -p security-artifacts
+      - run: npm audit --json > security-artifacts/npm-audit.json || true
+      - run: npm run collect-security-evidence
+      - run: npm run generate-third-party-notices
+      - run: npm run generate-security-release-index
+      - run: npm run verify-security-gates
+      - uses: actions/upload-artifact@v4
+        with:
+          name: security-evidence
+          path: |
+            security-artifacts/npm-audit.json
+            security-artifacts/security-summary.json
+            security-artifacts/SECURITY_RELEASE_INDEX.md
+            THREAT_MODEL_SUMMARY.md
+            SECURITY_TRIAGE_LOG.md
+            THIRD_PARTY_NOTICES.md
+            THIRD_PARTY_NOTICES_REVIEW.md

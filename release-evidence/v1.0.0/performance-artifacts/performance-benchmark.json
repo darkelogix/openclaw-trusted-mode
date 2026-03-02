@@ -1,0 +1,18 @@
+{
+  "generated_at": "2026-03-01T20:41:38.236Z",
+  "pdp_url": "http://localhost:8001/v1/authorize",
+  "pdp_latency": {
+    "sample_count": 120,
+    "avg_ms": 1.643,
+    "min_ms": 0.997,
+    "p50_ms": 1.456,
+    "p95_ms": 2.565,
+    "max_ms": 3.791
+  },
+  "interception_overhead": {
+    "iterations": 20000,
+    "total_ms": 87.403,
+    "avg_ms_per_intercept": 0.004,
+    "blocked_count": 0
+  }
+}

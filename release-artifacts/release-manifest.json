@@ -1,0 +1,41 @@
+{
+  "release_version": "1.0.0",
+  "generated_at": "2026-03-01T20:43:51.188Z",
+  "files": [
+    {
+      "path": "dist/index.js",
+      "sha256": "2168cd91dd4436f65845e85ffbd67b805df44ec485e4a15eb18582acab424071",
+      "bytes": 5280
+    },
+    {
+      "path": "dist/cli.js",
+      "sha256": "d5118f837f1cf8d5a47bf66f73df38e95fd2cda0ca755be4bca426cf1526ba2e",
+      "bytes": 8716
+    },
+    {
+      "path": "openclaw.plugin.json",
+      "sha256": "4da45f080165a747ebb71c39dde606db236e4094635044b44f6ff63f67e9a063",
+      "bytes": 2042
+    },
+    {
+      "path": "attestation/trusted_mode_attest_v1.json",
+      "sha256": "6d58bfc4a02e6efeb0607864951deeb03a5d71bd4790c1d3aea9524e71456e08",
+      "bytes": 490
+    },
+    {
+      "path": "attestation/trusted_mode_attest_v1.sig",
+      "sha256": "5752f3718031c37ce793f570000540ecc92cd2e6ab0b8195036a13335fe96225",
+      "bytes": 71
+    },
+    {
+      "path": "RELEASE_v1.0.0.md",
+      "sha256": "a0a422cf5b3c872f385a8c3a9dcaa0f9fe01bb81bf663c4c01d1c00924e334ec",
+      "bytes": 2268
+    },
+    {
+      "path": "COMPATIBILITY_MATRIX.md",
+      "sha256": "de71eb445bac406bdcb57fa00b350789bd9fcfd2b267ed91971498df93e684b9",
+      "bytes": 1169
+    }
+  ]
+}

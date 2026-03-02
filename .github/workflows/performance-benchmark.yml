@@ -1,0 +1,30 @@
+name: performance-benchmark
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: |
+          node scripts/mock_pdp.js &
+          sleep 1
+          PDP_URL=http://localhost:8001/v1/authorize npm run performance-benchmark
+      - uses: actions/upload-artifact@v4
+        with:
+          name: performance-benchmark
+          path: |
+            performance-artifacts/performance-benchmark.json
+            PERFORMANCE_BASELINE.md

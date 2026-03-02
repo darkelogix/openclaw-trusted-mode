@@ -1,0 +1,63 @@
+name: compatibility-certification
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - openclaw_version: 2026.2.15
+            certification_status: CERTIFIED_ENFORCED
+            expected_status: ENFORCED_OK
+          - openclaw_version: 2026.2.16
+            certification_status: LOCKDOWN_ONLY
+            expected_status: LOCKDOWN_ONLY
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: |
+          mkdir -p compat-results
+          node scripts/mock_pdp.js &
+          sleep 1
+          CERTIFICATION_STATUS=${{ matrix.certification_status }} \
+          EXPECTED_STATUS=${{ matrix.expected_status }} \
+          OPENCLAW_VERSION=${{ matrix.openclaw_version }} \
+          PDP_URL=http://localhost:8001/v1/authorize \
+          npm run trusted-mode-check -- --json > compat-results/${{ matrix.openclaw_version }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compat-${{ matrix.openclaw_version }}
+          path: compat-results/${{ matrix.openclaw_version }}.json
+
+  aggregate:
+    runs-on: ubuntu-latest
+    needs: certify
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: compat-*
+          merge-multiple: true
+          path: compat-results
+      - run: npm run update-compatibility-matrix
+      - run: npm run verify-compatibility-matrix
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compatibility-matrix
+          path: COMPATIBILITY_MATRIX.md
