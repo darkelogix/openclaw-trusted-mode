@@ -28,6 +28,7 @@ jobs:
       - run: npm run build
       - run: |
           mkdir -p compat-results
+          mkdir -p release-evidence/matrix/runs
           node scripts/mock_pdp.js &
           sleep 1
           CERTIFICATION_STATUS=${{ matrix.certification_status }} \
@@ -35,10 +36,15 @@ jobs:
           OPENCLAW_VERSION=${{ matrix.openclaw_version }} \
           PDP_URL=http://localhost:8001/v1/authorize \
           npm run trusted-mode-check -- --json > compat-results/${{ matrix.openclaw_version }}.json
+          cp compat-results/${{ matrix.openclaw_version }}.json release-evidence/matrix/runs/github-ubuntu-${{ matrix.openclaw_version }}.json
       - uses: actions/upload-artifact@v4
         with:
           name: compat-${{ matrix.openclaw_version }}
           path: compat-results/${{ matrix.openclaw_version }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: matrix-run-${{ matrix.openclaw_version }}
+          path: release-evidence/matrix/runs/github-ubuntu-${{ matrix.openclaw_version }}.json
 
   aggregate:
     runs-on: ubuntu-latest
