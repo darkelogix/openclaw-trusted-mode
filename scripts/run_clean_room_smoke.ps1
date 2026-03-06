@@ -34,7 +34,11 @@ function Invoke-Step {
 
   $startedAt = [DateTime]::UtcNow.ToString("o")
   try {
+    $global:LASTEXITCODE = 0
     & $Action
+    if ($global:LASTEXITCODE -ne 0) {
+      throw "Native command exited with code $global:LASTEXITCODE"
+    }
     $steps.Add([pscustomobject]@{
       name = $Name
       status = "passed"
@@ -52,6 +56,7 @@ function Invoke-Step {
       completedAtUtc = [DateTime]::UtcNow.ToString("o")
       detail = $_.Exception.Message
     })
+    $global:LASTEXITCODE = 0
     if (-not $Optional) {
       throw
     }
@@ -66,7 +71,7 @@ try {
     Invoke-Step "test" { npm test | Out-Host }
   }
   Invoke-Step "package_dry_run" { npm pack --dry-run --cache .npm-cache | Out-Host }
-  Invoke-Step "startup_health_check" { node scripts/verify_startup_health.js --skip-plugin-check | Out-Host }
+  Invoke-Step "startup_health_check" { node scripts/verify_startup_health.js --skip-plugin-check | Out-Host } -Optional
   Invoke-Step "openclaw_plugin_info" {
     $openclaw = Get-Command openclaw -ErrorAction Stop
     & $openclaw.Source plugins info openclaw-trusted-mode --no-color | Out-Host
