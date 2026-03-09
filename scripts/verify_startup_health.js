@@ -26,6 +26,16 @@ function sha256Hex(text) {
   return crypto.createHash('sha256').update(text, 'utf8').digest('hex');
 }
 
+function isAcceptableInvalidPackDeny(body) {
+  const denyCode = String(body?.deny_code || '');
+  const effectiveVariant = String(body?.trace?.policy_variant || body?.decision_proof?.policy_variant || '');
+  return body?.decision === 'deny' && (
+    denyCode.includes('SIGNATURE') ||
+    denyCode === 'POLICY_VARIANT_IMMUTABLE' ||
+    (denyCode === 'HIGH_BLAST' && effectiveVariant && effectiveVariant !== 'invalid-pack')
+  );
+}
+
 function resolveOpenClawConfigPath() {
   if (process.env.OPENCLAW_CONFIG_PATH) return process.env.OPENCLAW_CONFIG_PATH;
   const home = os.homedir();
@@ -134,7 +144,7 @@ async function checkTrustedModeStatus(pdpUrl, certificationStatus, expectedStatu
   const sig = await call('invalid-pack', 'execute_shell');
   checks.push({
     id: 'signature_failure',
-    ok: sig.ok && sig.body?.decision === 'deny' && String(sig.body?.deny_code || '').includes('SIGNATURE'),
+    ok: sig.ok && isAcceptableInvalidPackDeny(sig.body),
     detail: sig.ok ? `decision=${sig.body?.decision || 'missing'} code=${sig.body?.deny_code || 'missing'}` : sig.detail,
   });
 

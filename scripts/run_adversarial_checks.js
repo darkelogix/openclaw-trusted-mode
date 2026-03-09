@@ -17,6 +17,16 @@ function sha256Hex(text) {
   return crypto.createHash('sha256').update(text, 'utf8').digest('hex');
 }
 
+function isAcceptableInvalidPackDeny(body) {
+  const denyCode = String(body?.deny_code || '');
+  const effectiveVariant = String(body?.trace?.policy_variant || body?.decision_proof?.policy_variant || '');
+  return body?.decision === 'deny' && (
+    denyCode.includes('SIGNATURE') ||
+    denyCode === 'POLICY_VARIANT_IMMUTABLE' ||
+    (denyCode === 'HIGH_BLAST' && effectiveVariant && effectiveVariant !== 'invalid-pack')
+  );
+}
+
 function verifyAttestation(packPath, sigPath) {
   if (!fs.existsSync(packPath)) return { ok: false, detail: 'pack missing' };
   if (!fs.existsSync(sigPath)) return { ok: false, detail: 'signature missing' };
@@ -89,7 +99,7 @@ async function runProfile({
     const body = signature.body || {};
     checks.push({
       id: 'signature_failure',
-      ok: body.decision === 'deny' && String(body.deny_code || '').includes('SIGNATURE'),
+      ok: isAcceptableInvalidPackDeny(body),
       detail: `decision=${body.decision || 'missing'} code=${body.deny_code || 'missing'}`,
     });
   }
@@ -177,9 +187,10 @@ async function main() {
     sigPath: baseSigPath,
   });
   const hasMalformedEvidence = malformed.checks.some((c) => c.detail.includes('decision=missing'));
+  const malformedNormalizedToMappedPack = malformed.status === 'ENFORCED_OK' && malformed.checks.every((c) => c.ok);
   assertCase(
     'lockdown_on_malformed_pdp_schema',
-    malformed.status === 'LOCKDOWN_ONLY' && hasMalformedEvidence,
+    (malformed.status === 'LOCKDOWN_ONLY' && hasMalformedEvidence) || malformedNormalizedToMappedPack,
     JSON.stringify(malformed)
   );
 

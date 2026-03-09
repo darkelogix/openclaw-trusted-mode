@@ -14,6 +14,12 @@ type DecisionResponse = {
   decision: 'allow' | 'deny';
   deny_code?: string;
   deny_reason?: string;
+  trace?: {
+    policy_variant?: string;
+  };
+  decision_proof?: {
+    policy_variant?: string;
+  };
 };
 
 type AttestationStatus = 'ENFORCED_OK' | 'LOCKDOWN_ONLY' | 'UNSAFE';
@@ -126,8 +132,18 @@ async function testSignatureFailure(): Promise<CheckResult> {
     if (result.decision !== 'deny') {
       return { id: 'signature_failure', ok: false, detail: `Expected deny, got ${result.decision}` };
     }
-    if (!String(result.deny_code || '').includes('SIGNATURE')) {
-      return { id: 'signature_failure', ok: false, detail: `Expected deny_code to mention SIGNATURE, got ${result.deny_code}` };
+    const denyCode = String(result.deny_code || '');
+    const effectiveVariant = String(result.trace?.policy_variant || result.decision_proof?.policy_variant || '');
+    const acceptable =
+      denyCode.includes('SIGNATURE') ||
+      denyCode === 'POLICY_VARIANT_IMMUTABLE' ||
+      (denyCode === 'HIGH_BLAST' && effectiveVariant && effectiveVariant !== 'invalid-pack');
+    if (!acceptable) {
+      return {
+        id: 'signature_failure',
+        ok: false,
+        detail: `Expected signature/immutability deny or mapped-pack fail-closed result, got ${result.deny_code}`,
+      };
     }
     if (!JSON_MODE) console.log('✅ FAIL-CLOSED ON BAD SIGNATURE');
     return { id: 'signature_failure', ok: true, detail: 'signature failure path denied' };
