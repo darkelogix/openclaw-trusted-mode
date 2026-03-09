@@ -1,5 +1,7 @@
 # SDE PDP OpenClaw Plugin
 
+> Distribution note: treat this document as controlled technical validation material. Do not publish or transmit it outside darkelogix or an approved NDA/customer review flow without legal and export review.
+
 Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 
 ## Acronym Expansions

@@ -19,4 +19,4 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 
 | Package | Issue | Owner | Due Date | Status |
 |---|---|---|---|---|
-| (none yet) | Populate from generated notices review | Compliance Lead | TBD | Open |
+| Multiple packages in `THIRD_PARTY_NOTICES.md` | `UNKNOWN` license metadata remains unresolved and must be triaged before public release. | Compliance | Before next public release | Open |
