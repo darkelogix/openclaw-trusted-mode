@@ -19,7 +19,7 @@ function decide(payload) {
     return { decision: 'deny', deny_code: 'POLICY_SIGNATURE_INVALID' };
   }
 
-  if (tool === 'execute_shell') {
+  if (tool === 'execute_shell' || tool === 'exec') {
     return { decision: 'deny', deny_code: 'HIGH_BLAST' };
   }
 
