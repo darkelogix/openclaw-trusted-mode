@@ -27,8 +27,8 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 - [ ] Docker running
 - [ ] OpenClaw CLI reachable in runtime shell
 - [ ] Repos present:
-  - [ ] `C:\dev\openclaw-trusted-mode`
-  - [ ] `C:\dev\sde-enterprise`
+  - [ ] `<openclaw-trusted-mode-path>`
+  - [ ] `<sde-enterprise-path>`
 - [ ] Confirm alternate ports free:
   - [ ] `18001`
   - [ ] `18002`
@@ -46,7 +46,7 @@ Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -in 18001,18002
 ## 2) Compose Port Override
 
 - [ ] Create override file:
-  - `C:\dev\sde-enterprise\ops\docker-compose.override.ports.yml`
+  - `<sde-enterprise-path>\ops\docker-compose.override.ports.yml`
 
 Contents:
 
@@ -81,7 +81,7 @@ services:
 ### 3.1 Plugin build
 
 ```powershell
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 npm install
 npm run build
 ```
@@ -91,7 +91,7 @@ npm run build
 ### 3.2 Plugin install
 
 ```powershell
-wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins install /mnt/c/dev/openclaw-trusted-mode --no-color"
+wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins install /mnt/c/path/to/openclaw-trusted-mode --no-color"
 wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins info openclaw-trusted-mode --no-color"
 ```
 
@@ -106,7 +106,7 @@ wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins info openclaw-truste
 ### 3.4 Start PDP with override
 
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml -f ops/docker-compose.override.ports.yml up --build -d
 ```
 
@@ -151,7 +151,7 @@ curl -s -X POST http://localhost:18001/v1/authorize `
 Rollback command (alt stack down):
 
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml -f ops/docker-compose.override.ports.yml down
 ```
 
@@ -179,3 +179,5 @@ Approver:
 - Name: __________________
 - Role: __________________
 - Timestamp: __________________
+
+

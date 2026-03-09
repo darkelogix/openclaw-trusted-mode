@@ -35,8 +35,8 @@ Evidence:
 - [ ] OpenClaw CLI available in runtime shell
 - [ ] Node.js/npm available for plugin build
 - [ ] Repo access validated:
-  - [ ] `C:\dev\openclaw-trusted-mode`
-  - [ ] `C:\dev\sde-enterprise`
+  - [ ] `<openclaw-trusted-mode-path>`
+  - [ ] `<sde-enterprise-path>`
 
 ### 1.2 Port and network readiness
 
@@ -91,13 +91,13 @@ Evidence:
 
 - [ ] Plugin build succeeds:
 ```bash
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 npm install
 npm run build
 ```
 - [ ] Plugin installed:
 ```bash
-openclaw plugins install C:\dev\openclaw-trusted-mode --no-color
+openclaw plugins install <openclaw-trusted-mode-path> --no-color
 openclaw plugins info openclaw-trusted-mode --no-color
 ```
 - [ ] Plugin status is `loaded`
@@ -106,7 +106,7 @@ openclaw plugins info openclaw-trusted-mode --no-color
 
 - [ ] PDP stack starts:
 ```bash
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml up --build -d
 ```
 - [ ] Health check passes:
@@ -172,8 +172,8 @@ Run these tests after deployment and after any policy/plugin change.
 
 ### 5.3 Tool-name policy match validation
 
-- [ ] Confirm policy keys match actual runtime tool names (example `exec`)
-- [ ] No false allow caused by mismatched tool naming (`execute_shell` vs `exec`)
+- [x] Confirm policy keys match actual runtime tool names (validated shell tool id: `exec`)
+- [x] No false allow caused by mismatched tool naming (`execute_shell` vs `exec`) for the validated shell execution path
 
 Evidence:
 - [ ] Log excerpts attached for allow/deny/fail-closed cases
@@ -268,7 +268,7 @@ Evidence:
 - [ ] NO-GO
 
 Approver:
-- Name: `ORG_SUPPORT_PRIMARY_OWNER`
+- Name: `<support-primary-owner>`
 - Role: `<role>`
 - Timestamp: `<timestamp>`
 
@@ -298,3 +298,4 @@ curl -s -X POST http://localhost:8001/v1/authorize `
   -H "Content-Type: application/json" `
   -d "{\"decision_sku\":\"openclaw.trusted_mode.authorize.v1\",\"policy_variant\":\"guard-pro.v2026.02\",\"inputs\":{\"action_request\":{\"tool_name\":\"read_file\",\"params\":{\"path\":\"/tmp/x\"}}},\"tenant_id\":\"trial-tenant\"}"
 ```
+

@@ -27,8 +27,8 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 - [ ] OpenClaw CLI reachable in runtime shell
 - [ ] Node/npm available for plugin build
 - [ ] Repos present:
-  - [ ] `C:\dev\openclaw-trusted-mode`
-  - [ ] `C:\dev\sde-enterprise`
+  - [ ] `<openclaw-trusted-mode-path>`
+  - [ ] `<sde-enterprise-path>`
 - [ ] Ports available:
   - [ ] `8001` PDP
   - [ ] `8002` hardening (optional)
@@ -45,9 +45,9 @@ If ports unavailable, pick alternates (example `18001/18002/18003`) and update p
 - [ ] `tenantId="trial-tenant"` (or production tenant) in plugin config
 - [ ] `plugins.allow` set to trusted plugin IDs (recommended)
 - [ ] Entitlements updated for production tenant(s) in:
-  - `C:\dev\sde-enterprise\ops\entitlements.json`
+  - `<sde-enterprise-path>\ops\entitlements.json`
 - [ ] Variant mapping set as needed in:
-  - `C:\dev\sde-enterprise\ops\tenant_variants.json`
+  - `<sde-enterprise-path>\ops\tenant_variants.json`
 - [ ] Policy pack + signature present:
   - `guard_pro_v2026_02.json`
   - `guard_pro_v2026_02.sig`
@@ -59,7 +59,7 @@ If ports unavailable, pick alternates (example `18001/18002/18003`) and update p
 ### 3.1 Build plugin
 
 ```powershell
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 npm install
 npm run build
 ```
@@ -71,14 +71,14 @@ npm run build
 Preferred (same runtime shell as OpenClaw):
 
 ```bash
-openclaw plugins install /mnt/c/dev/openclaw-trusted-mode --no-color
+openclaw plugins install /mnt/c/path/to/openclaw-trusted-mode --no-color
 openclaw plugins info openclaw-trusted-mode --no-color
 ```
 
 Windows + WSL example:
 
 ```powershell
-wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins install /mnt/c/dev/openclaw-trusted-mode --no-color"
+wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins install /mnt/c/path/to/openclaw-trusted-mode --no-color"
 wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins info openclaw-trusted-mode --no-color"
 ```
 
@@ -87,7 +87,7 @@ wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins info openclaw-truste
 ### 3.3 Start PDP
 
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml up --build -d
 ```
 
@@ -99,9 +99,9 @@ docker compose -f ops/docker-compose.pdp.yml up --build -d
 
 - [ ] Backed up:
   - [ ] `$HOME\.openclaw\openclaw.json`
-  - [ ] `C:\dev\sde-enterprise\ops\entitlements.json`
-  - [ ] `C:\dev\sde-enterprise\ops\tenant_variants.json`
-  - [ ] `C:\dev\sde-enterprise\packs\openclaw_trusted_mode\policy_packs\*.json/.sig`
+  - [ ] `<sde-enterprise-path>\ops\entitlements.json`
+  - [ ] `<sde-enterprise-path>\ops\tenant_variants.json`
+  - [ ] `<sde-enterprise-path>\packs\openclaw_trusted_mode\policy_packs\*.json/.sig`
 - [ ] Prior known-good policy variant identified
 - [ ] Rollback owner + commands documented in ticket
 
@@ -200,3 +200,5 @@ Approver:
 - Name: __________________
 - Role: __________________
 - Timestamp: __________________
+
+

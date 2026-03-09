@@ -27,9 +27,9 @@ It includes install, reinstall, uninstall, startup, configuration, selective all
 If you need a simpler day-to-day version, use [`RUNBOOK_NON_TECHNICAL.md`](./RUNBOOK_NON_TECHNICAL.md).
 
 Path defaults used in this guide:
-- `C:\dev\openclaw-trusted-mode` = local path to `openclaw-trusted-mode`
-- `C:\dev\sde-enterprise` = local path to `sde-enterprise`
-- Org keys (for example `ORG_LICENSE_SERVER_FQDN`, `ORG_SUPPORT_*`) are defined in `C:\dev\ORG_VALUES.md`.
+- `<openclaw-trusted-mode-path>` = local path to `openclaw-trusted-mode`
+- `<sde-enterprise-path>` = local path to `sde-enterprise`
+- Org keys (for example `<license-server-fqdn>`, `<support-contact-placeholders>`) are defined in `<org-values-file>`.
 
 ## Compatibility Matrix
 
@@ -46,8 +46,8 @@ Path defaults used in this guide:
 
 Before install/startup, confirm:
 
-1. `C:\dev\openclaw-trusted-mode` exists and `npm run build` succeeds.
-2. `C:\dev\sde-enterprise` exists and includes:
+1. `<openclaw-trusted-mode-path>` exists and `npm run build` succeeds.
+2. `<sde-enterprise-path>` exists and includes:
    - `ops/Dockerfile.pdp`
    - `ops/docker-compose.pdp.yml`
    - `packs/openclaw_trusted_mode/policy_packs/*.json` and matching `*.sig`
@@ -80,7 +80,7 @@ Example host remap:
 
 ### Compose override example
 
-Create `C:\dev\sde-enterprise/ops/docker-compose.override.ports.yml`:
+Create `<sde-enterprise-path>/ops/docker-compose.override.ports.yml`:
 
 ```yaml
 services:
@@ -107,14 +107,14 @@ services:
 Run with overrides:
 
 ```bash
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml -f ops/docker-compose.override.ports.yml up --build -d
 ```
 
 PowerShell:
 
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml -f ops/docker-compose.override.ports.yml up --build -d
 ```
 
@@ -152,8 +152,8 @@ Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -in 8001,8002,8
 - Node.js/npm
 - OpenClaw CLI (`openclaw`) available in your shell environment
 - Repos available locally:
-  - `C:\dev\openclaw-trusted-mode`
-  - `C:\dev\sde-enterprise`
+  - `<openclaw-trusted-mode-path>`
+  - `<sde-enterprise-path>`
 
 Recommended (not required):
 - WSL2 on Windows for Linux-like OpenClaw runtime
@@ -176,7 +176,7 @@ Notes:
 ### 3.1 Build the plugin
 
 ```bash
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 npm install
 npm run build
 ```
@@ -184,7 +184,7 @@ npm run build
 PowerShell:
 
 ```powershell
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 npm install
 npm run build
 ```
@@ -192,14 +192,14 @@ npm run build
 ### 3.2 Install plugin into OpenClaw
 
 ```bash
-openclaw plugins install C:\dev\openclaw-trusted-mode --no-color
+openclaw plugins install <openclaw-trusted-mode-path> --no-color
 openclaw plugins info openclaw-trusted-mode --no-color
 ```
 
 Windows + WSL example:
 
 ```powershell
-wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins install /mnt/c/dev/openclaw-trusted-mode --no-color"
+wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins install /mnt/c/path/to/openclaw-trusted-mode --no-color"
 wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins info openclaw-trusted-mode --no-color"
 ```
 
@@ -212,14 +212,14 @@ Expected:
 Option A: PDP only
 
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml up --build
 ```
 
 Option B: Reference stack (PDP + hardening + license server)
 
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.reference.yml up --build
 ```
 
@@ -265,7 +265,7 @@ curl -s -X POST http://localhost:8001/v1/authorize `
 
 1. Start PDP stack:
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml up -d
 ```
 2. Start/restart OpenClaw gateway:
@@ -280,7 +280,7 @@ openclaw status --no-color
 ### Stop
 
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml down
 ```
 
@@ -305,11 +305,11 @@ Example:
           "pdpTimeoutMs": 5000,
           "failClosed": true,
           "tenantId": "trial-tenant",
-          "toolPolicyMode": "PDP",
+          "toolPolicyMode": "ALLOWLIST_ONLY",
           "allowedTools": ["read_file", "list_files"],
           "requireTenantId": true,
           "allowedTenantIds": ["trial-tenant", "enterprise-tenant"],
-          "highRiskTools": ["execute_shell", "run_shell_command", "shell", "delete_file", "remove_file", "write_file", "edit_file"],
+          "highRiskTools": ["exec", "execute_shell", "run_shell_command", "shell", "delete_file", "remove_file", "write_file", "edit_file"],
           "contextCurator": {
             "enabled": false,
             "redactKeys": [],
@@ -324,7 +324,7 @@ Example:
 ```
 
 Config schema source:
-- `C:\dev\openclaw-trusted-mode/openclaw.plugin.json`
+- `<openclaw-trusted-mode-path>/openclaw.plugin.json`
 
 ### 5.1.1 Hardening options (plugin)
 
@@ -333,7 +333,7 @@ Config schema source:
 | `failClosed` | Block on PDP failure/timeouts | `true` | Keep enabled except controlled troubleshooting windows. |
 | `certificationStatus` | Runtime posture (`CERTIFIED_ENFORCED` vs fallback) | `CERTIFIED_ENFORCED` only on certified builds | For uncertified builds use `LOCKDOWN_ONLY`. |
 | `highRiskTools` | Certification fallback blocklist | Include shell/write/delete families | Keep list aligned with runtime tool catalog. |
-| `toolPolicyMode` | Local pre-PDP gating mode (`PDP` or `ALLOWLIST_ONLY`) | `PDP` normally; `ALLOWLIST_ONLY` for restricted tenants | In `ALLOWLIST_ONLY`, non-allowlisted tools are blocked before PDP. |
+| `toolPolicyMode` | Local pre-PDP gating mode (`PDP` or `ALLOWLIST_ONLY`) | `ALLOWLIST_ONLY` for standalone/free mode; `PDP` for SDE-backed mode | In `ALLOWLIST_ONLY`, non-allowlisted tools are blocked before PDP. |
 | `allowedTools` | Local allowlist when `toolPolicyMode=ALLOWLIST_ONLY` | Explicit minimal list | Empty list in allowlist mode causes fail-closed blocking. |
 | `requireTenantId` | Enforce tenant ID presence | `true` for multi-tenant/enterprise | Missing `tenantId` causes hard block in plugin. |
 | `allowedTenantIds` | Restrict plugin to explicit tenant IDs | Explicit tenant set | If `tenantId` not in list, plugin blocks all tool calls. |
@@ -361,18 +361,18 @@ Certification fallback profile (uncertified runtime):
   "toolPolicyMode": "PDP",
   "requireTenantId": true,
   "certificationStatus": "LOCKDOWN_ONLY",
-  "highRiskTools": ["execute_shell", "delete_file", "write_file", "edit_file"]
+  "highRiskTools": ["exec", "execute_shell", "delete_file", "write_file", "edit_file"]
 }
 ```
 
 ### 5.2 PDP configs
 
 - Entitlements:
-  - `C:\dev\sde-enterprise/ops/entitlements.json`
+  - `<sde-enterprise-path>/ops/entitlements.json`
 - Tenant -> policy variant mapping:
-  - `C:\dev\sde-enterprise/ops/tenant_variants.json`
+  - `<sde-enterprise-path>/ops/tenant_variants.json`
 - Policy pack:
-  - `C:\dev\sde-enterprise/packs/openclaw_trusted_mode/policy_packs/guard_pro_v2026_02.json`
+  - `<sde-enterprise-path>/packs/openclaw_trusted_mode/policy_packs/guard_pro_v2026_02.json`
   - Signature file: same base with `.sig`
 
 Optional env vars:
@@ -394,7 +394,7 @@ Current example policy format:
   "version": "guard-pro.v2026.02",
   "rules": {
     "default": {"action": "allow"},
-    "execute_shell": {"action": "deny", "code": "HIGH_BLAST", "reason": "Shell execution blocked by default policy"},
+    "exec": {"action": "deny", "code": "HIGH_BLAST", "reason": "Shell execution blocked by default policy"},
     "delete_file": {"action": "deny", "code": "HIGH_BLAST", "reason": "File deletion blocked"},
     "write_file": {"action": "allow", "constraints": [{"key": "path", "allowed_prefixes": ["/tmp", "/safe"]}]}
   }
@@ -419,7 +419,7 @@ After policy edits:
 1. Re-sign policy pack if signature enforcement is active.
 2. Restart PDP container:
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml up --build -d
 ```
 
@@ -439,14 +439,14 @@ This PDP does not expose runtime `load`/`unload` commands. Operationally:
 ### Load / Activate a pack version
 
 1. Add pack JSON and signature:
-   - `C:\dev\sde-enterprise/packs/openclaw_trusted_mode/policy_packs/<variant>.json`
-   - `C:\dev\sde-enterprise/packs/openclaw_trusted_mode/policy_packs/<variant>.sig`
+   - `<sde-enterprise-path>/packs/openclaw_trusted_mode/policy_packs/<variant>.json`
+   - `<sde-enterprise-path>/packs/openclaw_trusted_mode/policy_packs/<variant>.sig`
 2. Activate variant:
    - Global default: set `POLICY_VARIANT=<variant>` for PDP service
    - Per tenant: update `ops/tenant_variants.json`
 3. Restart PDP:
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml up --build -d
 ```
 4. Verify:
@@ -474,7 +474,7 @@ docker compose -f ops/docker-compose.pdp.yml up --build -d
 ### 7.1 Plugin reinstall
 
 ```powershell
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 npm run build
 ```
 
@@ -485,7 +485,7 @@ Then reinstall:
 
 ```powershell
 openclaw plugins uninstall openclaw-trusted-mode --no-color || true
-openclaw plugins install C:\dev\openclaw-trusted-mode --no-color
+openclaw plugins install <openclaw-trusted-mode-path> --no-color
 openclaw plugins info openclaw-trusted-mode --no-color
 ```
 
@@ -493,14 +493,14 @@ Windows + WSL example:
 
 ```powershell
 wsl bash -lc "rm -rf /home/\$USER/.openclaw/extensions/openclaw-trusted-mode"
-wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins install /mnt/c/dev/openclaw-trusted-mode --no-color"
+wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins install /mnt/c/path/to/openclaw-trusted-mode --no-color"
 wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins info openclaw-trusted-mode --no-color"
 ```
 
 ### 7.2 SDE-PDP reinstall
 
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml down
 docker compose -f ops/docker-compose.pdp.yml up --build -d
 ```
@@ -534,7 +534,7 @@ Also remove plugin entry from:
 ### 8.2 SDE-PDP uninstall
 
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml down
 docker image rm sde-pdp:local
 ```
@@ -608,11 +608,11 @@ Current metadata:
 
 Recommended operational contact block (fill in for your org):
 
-- Primary owner: `ORG_SUPPORT_PRIMARY_OWNER`
-- Backup owner: `ORG_SUPPORT_BACKUP_OWNER`
-- On-call channel: `ORG_SUPPORT_ONCALL_CHANNEL`
-- Incident email: `ORG_SUPPORT_INCIDENT_EMAIL`
-- Escalation path: `ORG_SUPPORT_ESCALATION_PATH`
+- Primary owner: `<support-primary-owner>`
+- Backup owner: `<support-backup-owner>`
+- On-call channel: `<support-oncall-channel>`
+- Incident email: `<support-incident-email>`
+- Escalation path: `<support-escalation-path>`
 
 ## 13) Release and Version Management
 
@@ -716,14 +716,14 @@ validated_on: "2026-03-01"
 - OpenClaw config:
   - `~/.openclaw/openclaw.json`
 - Plugin package/config snapshot:
-  - `C:\dev\openclaw-trusted-mode/openclaw.plugin.json`
-  - `C:\dev\openclaw-trusted-mode/package.json`
+  - `<openclaw-trusted-mode-path>/openclaw.plugin.json`
+  - `<openclaw-trusted-mode-path>/package.json`
 - PDP runtime configs:
-  - `C:\dev\sde-enterprise/ops/entitlements.json`
-  - `C:\dev\sde-enterprise/ops/tenant_variants.json`
+  - `<sde-enterprise-path>/ops/entitlements.json`
+  - `<sde-enterprise-path>/ops/tenant_variants.json`
 - Policy packs:
-  - `C:\dev\sde-enterprise/packs/openclaw_trusted_mode/policy_packs/*.json`
-  - `C:\dev\sde-enterprise/packs/openclaw_trusted_mode/policy_packs/*.sig`
+  - `<sde-enterprise-path>/packs/openclaw_trusted_mode/policy_packs/*.json`
+  - `<sde-enterprise-path>/packs/openclaw_trusted_mode/policy_packs/*.sig`
 - Optional:
   - audit export files referenced by `AUDIT_EXPORT_PATH`
 
@@ -732,9 +732,9 @@ validated_on: "2026-03-01"
 ```bash
 mkdir -p ./backup/trusted-mode
 cp ~/.openclaw/openclaw.json ./backup/trusted-mode/openclaw.json.bak
-cp C:\dev\sde-enterprise/ops/entitlements.json ./backup/trusted-mode/entitlements.json.bak
-cp C:\dev\sde-enterprise/ops/tenant_variants.json ./backup/trusted-mode/tenant_variants.json.bak
-cp C:\dev\sde-enterprise/packs/openclaw_trusted_mode/policy_packs/* ./backup/trusted-mode/
+cp <sde-enterprise-path>/ops/entitlements.json ./backup/trusted-mode/entitlements.json.bak
+cp <sde-enterprise-path>/ops/tenant_variants.json ./backup/trusted-mode/tenant_variants.json.bak
+cp <sde-enterprise-path>/packs/openclaw_trusted_mode/policy_packs/* ./backup/trusted-mode/
 ```
 
 PowerShell:
@@ -742,9 +742,9 @@ PowerShell:
 ```powershell
 New-Item -ItemType Directory -Force .\backup\trusted-mode | Out-Null
 Copy-Item $HOME\.openclaw\openclaw.json .\backup\trusted-mode\openclaw.json.bak -Force
-Copy-Item C:\dev\sde-enterprise\ops\entitlements.json .\backup\trusted-mode\entitlements.json.bak -Force
-Copy-Item C:\dev\sde-enterprise\ops\tenant_variants.json .\backup\trusted-mode\tenant_variants.json.bak -Force
-Copy-Item C:\dev\sde-enterprise\packs\openclaw_trusted_mode\policy_packs\* .\backup\trusted-mode\ -Force
+Copy-Item <sde-enterprise-path>\ops\entitlements.json .\backup\trusted-mode\entitlements.json.bak -Force
+Copy-Item <sde-enterprise-path>\ops\tenant_variants.json .\backup\trusted-mode\tenant_variants.json.bak -Force
+Copy-Item <sde-enterprise-path>\packs\openclaw_trusted_mode\policy_packs\* .\backup\trusted-mode\ -Force
 ```
 
 ### Restore / rollback procedure
@@ -798,7 +798,7 @@ Expected result:
 POSIX:
 
 ```bash
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 node scripts/mock_pdp.js &
 PDP_PID=$!
 sleep 1
@@ -812,7 +812,7 @@ kill $PDP_PID
 PowerShell:
 
 ```powershell
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 $p = Start-Process -FilePath node -ArgumentList 'scripts/mock_pdp.js' -PassThru
 Start-Sleep -Seconds 1
 $env:PDP_URL='http://localhost:8001/v1/authorize'
@@ -832,7 +832,7 @@ Expected result:
 POSIX:
 
 ```bash
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 node scripts/mock_pdp.js &
 PDP_PID=$!
 sleep 1
@@ -847,7 +847,7 @@ kill $PDP_PID
 PowerShell:
 
 ```powershell
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 $p = Start-Process -FilePath node -ArgumentList 'scripts/mock_pdp.js' -PassThru
 Start-Sleep -Seconds 1
 $env:PDP_URL='http://localhost:8001/v1/authorize'
@@ -862,8 +862,8 @@ Stop-Process -Id $p.Id -Force
 ### C) Required attestation files
 
 Trusted Mode Check reads:
-- `C:\dev\openclaw-trusted-mode/attestation/trusted_mode_attest_v1.json`
-- `C:\dev\openclaw-trusted-mode/attestation/trusted_mode_attest_v1.sig`
+- `<openclaw-trusted-mode-path>/attestation/trusted_mode_attest_v1.json`
+- `<openclaw-trusted-mode-path>/attestation/trusted_mode_attest_v1.sig`
 
 If signature verification fails, status will move to `UNSAFE`.
 
@@ -872,7 +872,7 @@ If signature verification fails, status will move to `UNSAFE`.
 Run a single orchestration check for plugin config/install presence, attestation integrity, PDP health, and expected certification status:
 
 ```bash
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 PDP_URL=http://localhost:8001/v1/authorize \
 CERTIFICATION_STATUS=CERTIFIED_ENFORCED \
 EXPECTED_STATUS=ENFORCED_OK \
@@ -882,7 +882,7 @@ npm run startup-health-check
 PowerShell:
 
 ```powershell
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 $env:PDP_URL='http://localhost:8001/v1/authorize'
 $env:CERTIFICATION_STATUS='CERTIFIED_ENFORCED'
 $env:EXPECTED_STATUS='ENFORCED_OK'
@@ -913,7 +913,7 @@ npm run startup-health-check -- --skip-plugin-check
 grep -n "Trusted Mode DEBUG\|before_tool_call\|BLOCKED\|fetch failed" /tmp/openclaw/openclaw-*.log | tail -n 200
 
 # PDP logs
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml logs --tail=200
 ```
 
@@ -1031,13 +1031,13 @@ Actions:
 
 Fill this for production operations:
 
-- Service owner: `ORG_SUPPORT_SERVICE_OWNER`
-- Secondary owner: `ORG_SUPPORT_BACKUP_OWNER`
-- On-call schedule: `ORG_SUPPORT_ONCALL_SCHEDULE`
+- Service owner: `<support-service-owner>`
+- Secondary owner: `<support-backup-owner>`
+- On-call schedule: `<support-oncall-schedule>`
 - Contact channels:
-  - Chat: `ORG_SUPPORT_ONCALL_CHANNEL`
-  - Email: `ORG_SUPPORT_CONTACT_EMAIL`
-  - Ticket queue: `ORG_SUPPORT_TICKET_QUEUE`
+  - Chat: `<support-oncall-channel>`
+  - Email: `<support-contact-email>`
+  - Ticket queue: `<support-ticket-queue>`
 
 Recommended SLA targets:
 
@@ -1047,3 +1047,6 @@ Recommended SLA targets:
 
 Track:
 - MTTD, MTTR, incident count, rollback frequency, failed change rate.
+
+
+

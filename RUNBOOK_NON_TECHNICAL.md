@@ -13,9 +13,9 @@ Use this guide if you need to operate the system day-to-day without deep enginee
 For first-time install and first-success checks, use [`START_HERE.md`](./START_HERE.md) first.
 
 Path defaults used in this runbook:
-- `C:\dev\openclaw-trusted-mode` = local path to `openclaw-trusted-mode`
-- `C:\dev\sde-enterprise` = local path to `sde-enterprise`
-- Org keys (for example `ORG_LICENSE_SERVER_FQDN`, `ORG_SUPPORT_*`) are defined in `C:\dev\ORG_VALUES.md`.
+- `<openclaw-trusted-mode-path>` = local path to `openclaw-trusted-mode`
+- `<sde-enterprise-path>` = local path to `sde-enterprise`
+- Org keys (for example `<license-server-fqdn>`, `<support-contact-placeholders>`) are defined in `<org-values-file>`.
 
 This runbook covers:
 
@@ -44,15 +44,15 @@ If OpenClaw warns that config was written by a newer CLI version, this is often 
 - Use `bash/zsh` commands by default.
 - Use PowerShell variants when shown.
 - On Windows with WSL:
-  - Windows path: `C:\dev\openclaw-trusted-mode`
-  - WSL path: `/mnt/c/dev/openclaw-trusted-mode`
+  - Windows path: `<openclaw-trusted-mode-path>`
+  - WSL path: `/mnt/c/path/to/openclaw-trusted-mode`
 
 ## Preflight checklist
 
 Before starting:
 
-1. `C:\dev\openclaw-trusted-mode` exists.
-2. `C:\dev\sde-enterprise` exists.
+1. `<openclaw-trusted-mode-path>` exists.
+2. `<sde-enterprise-path>` exists.
 3. Docker is running.
 4. PDP health endpoint responds after startup:
    - `curl -s http://localhost:8001/healthz`
@@ -111,14 +111,14 @@ curl -s http://localhost:8001/healthz
 ### 1) Start policy service (PDP)
 
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml up -d
 ```
 
 bash/zsh:
 
 ```bash
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml up -d
 ```
 
@@ -164,7 +164,7 @@ Expected:
 ## Stop
 
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml down
 ```
 
@@ -177,7 +177,7 @@ Do this:
 
 1. Start or restart PDP:
 ```powershell
-cd C:\dev\sde-enterprise
+cd <sde-enterprise-path>
 docker compose -f ops/docker-compose.pdp.yml up -d --build
 ```
 2. Re-check health:
@@ -194,22 +194,22 @@ openclaw gateway restart --no-color
 Run these in order:
 
 ```powershell
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 npm install
 npm run build
 openclaw plugins uninstall openclaw-trusted-mode --no-color || true
-openclaw plugins install C:\dev\openclaw-trusted-mode --no-color
+openclaw plugins install <openclaw-trusted-mode-path> --no-color
 openclaw plugins info openclaw-trusted-mode --no-color
 ```
 
 Windows + WSL example:
 
 ```powershell
-cd C:\dev\openclaw-trusted-mode
+cd <openclaw-trusted-mode-path>
 npm install
 npm run build
 wsl bash -lc "rm -rf /home/\$USER/.openclaw/extensions/openclaw-trusted-mode"
-wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins install /mnt/c/dev/openclaw-trusted-mode --no-color"
+wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins install /mnt/c/path/to/openclaw-trusted-mode --no-color"
 wsl bash -lc "/home/\$USER/.npm-global/bin/openclaw plugins info openclaw-trusted-mode --no-color"
 ```
 
@@ -246,12 +246,12 @@ Expected:
 - PDP may be down.
 - Check health and restart services.
 
-## Escalation contacts (fill this in)
+## Escalation contacts (configure for your organization)
 
-- Primary owner: `ORG_SUPPORT_PRIMARY_OWNER`
-- Secondary owner: `ORG_SUPPORT_BACKUP_OWNER`
-- On-call channel: `ORG_SUPPORT_ONCALL_CHANNEL`
-- Incident email: `ORG_SUPPORT_INCIDENT_EMAIL`
+- Primary owner: `<support-primary-owner>`
+- Secondary owner: `<support-backup-owner>`
+- On-call channel: `<support-oncall-channel>`
+- Incident email: `<support-incident-email>`
 
 ## Related docs
 
@@ -311,3 +311,6 @@ Use this quick checklist before go-live:
 1. Restore known-good `.json/.sig` pair.
 2. Restart PDP.
 3. Re-test.
+
+
+

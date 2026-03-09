@@ -9,7 +9,8 @@
           "pdpTimeoutMs": 5000,
           "failClosed": true,
           "tenantId": "trial-tenant",
-          "toolPolicyMode": "PDP",
+          "toolPolicyMode": "ALLOWLIST_ONLY",
+          "allowedTools": ["read_file", "list_files", "search_files"],
           "requireTenantId": true,
           "allowedTenantIds": ["trial-tenant"]
         }

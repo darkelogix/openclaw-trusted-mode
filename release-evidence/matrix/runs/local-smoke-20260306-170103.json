@@ -1,0 +1,48 @@
+{
+    "capturedAtUtc":  "2026-03-06T22:01:10.4304854Z",
+    "runId":  "local-smoke-20260306-170103",
+    "environmentLabel":  "local-smoke",
+    "openclawVersion":  "2026.2.16",
+    "certificationStatus":  "LOCKDOWN_ONLY",
+    "repoRoot":  "C:\\dev\\openclaw-trusted-mode",
+    "isolatedTempRoot":  "C:\\dev\\openclaw-trusted-mode\\.clean-room\\local-smoke-20260306-170103",
+    "overallStatus":  "passed",
+    "steps":  [
+                  {
+                      "name":  "build",
+                      "status":  "passed",
+                      "optional":  false,
+                      "startedAtUtc":  "2026-03-06T22:01:03.9377732Z",
+                      "completedAtUtc":  "2026-03-06T22:01:08.0536491Z"
+                  },
+                  {
+                      "name":  "verify_plugin_schema_contract",
+                      "status":  "passed",
+                      "optional":  false,
+                      "startedAtUtc":  "2026-03-06T22:01:08.0536491Z",
+                      "completedAtUtc":  "2026-03-06T22:01:08.1522540Z"
+                  },
+                  {
+                      "name":  "package_dry_run",
+                      "status":  "passed",
+                      "optional":  false,
+                      "startedAtUtc":  "2026-03-06T22:01:08.1522540Z",
+                      "completedAtUtc":  "2026-03-06T22:01:10.0389790Z"
+                  },
+                  {
+                      "name":  "startup_health_check",
+                      "status":  "passed",
+                      "optional":  false,
+                      "startedAtUtc":  "2026-03-06T22:01:10.0389790Z",
+                      "completedAtUtc":  "2026-03-06T22:01:10.3765269Z"
+                  },
+                  {
+                      "name":  "openclaw_plugin_info",
+                      "status":  "warning",
+                      "optional":  true,
+                      "startedAtUtc":  "2026-03-06T22:01:10.3765269Z",
+                      "completedAtUtc":  "2026-03-06T22:01:10.4304854Z",
+                      "detail":  "The term \u0027openclaw\u0027 is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again."
+                  }
+              ]
+}

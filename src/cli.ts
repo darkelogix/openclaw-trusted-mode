@@ -78,7 +78,7 @@ async function testDenyHighImpact(): Promise<CheckResult> {
     decision_sku: 'openclaw.trusted_mode.authorize.v1',
     policy_variant: POLICY_VARIANT,
     tenant_id: TENANT_ID,
-    inputs: { action_request: { tool_name: 'execute_shell', params: {} } },
+    inputs: { action_request: { tool_name: 'exec', params: {} } },
   };
   try {
     const result = await post(payload);
@@ -88,7 +88,7 @@ async function testDenyHighImpact(): Promise<CheckResult> {
     if (result.deny_code !== 'HIGH_BLAST') {
       return { id: 'deny_high_impact', ok: false, detail: `Expected deny_code=HIGH_BLAST, got ${result.deny_code}` };
     }
-    if (!JSON_MODE) console.log('✅ HIGH-IMPACT TOOL BLOCKED (execute_shell)');
+    if (!JSON_MODE) console.log('✅ HIGH-IMPACT TOOL BLOCKED (exec)');
     return { id: 'deny_high_impact', ok: true, detail: 'HIGH_BLAST deny verified' };
   } catch (err: any) {
     return { id: 'deny_high_impact', ok: false, detail: err?.message || String(err) };
@@ -119,7 +119,7 @@ async function testSignatureFailure(): Promise<CheckResult> {
     decision_sku: 'openclaw.trusted_mode.authorize.v1',
     policy_variant: 'invalid-pack',
     tenant_id: TENANT_ID,
-    inputs: { action_request: { tool_name: 'execute_shell', params: {} } },
+    inputs: { action_request: { tool_name: 'exec', params: {} } },
   };
   try {
     const result = await post(payload);

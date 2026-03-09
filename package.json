@@ -1,9 +1,33 @@
 {
-  "name": "openclaw-trusted-mode",
+  "name": "@darkelogix/openclaw-trusted-mode",
   "version": "1.0.0",
+  "description": "MIT-licensed OpenClaw Trusted Mode plugin with standalone hardening and optional SDE-backed governance",
+  "license": "MIT",
   "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "bin": {
-    "trusted-mode-check": "dist/cli.js"
+    "openclaw-trusted-mode-check": "./dist/cli.js"
+  },
+  "homepage": "https://www.darkelogix.ai/openclaw/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/darkelogix/openclaw-trusted-mode.git"
+  },
+  "bugs": {
+    "url": "https://www.darkelogix.ai/contact/"
+  },
+  "keywords": [
+    "openclaw",
+    "trusted-mode",
+    "policy-enforcement",
+    "governance",
+    "security",
+    "darkelogix"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "openclaw": {
     "extensions": [
@@ -11,8 +35,13 @@
     ]
   },
   "files": [
-    "dist/",
-    "attestation/",
+    "dist/attestation.js",
+    "dist/cli.js",
+    "dist/constraints.js",
+    "dist/contextCurator.js",
+    "dist/hardening.js",
+    "dist/index.js",
+    "dist/runtimeCertification.js",
     "openclaw.plugin.json",
     "openclaw.user-config.entry.example.json",
     "README.md",
@@ -36,10 +65,12 @@
     "bundle-release-evidence": "node scripts/bundle_release_evidence.js",
     "adversarial-check": "node scripts/run_adversarial_checks.js",
     "startup-health-check": "node scripts/verify_startup_health.js",
+    "clean-room-smoke": "powershell -ExecutionPolicy Bypass -File scripts/run_clean_room_smoke.ps1",
     "performance-benchmark": "node scripts/run_performance_benchmark.js",
     "test-pack-matrix": "python scripts/run_test_pack_matrix.py",
     "update-compatibility-matrix": "node scripts/update_compatibility_matrix.js",
     "verify-compatibility-matrix": "node scripts/update_compatibility_matrix.js --check",
+    "enforce-cert-quota": "node scripts/enforce_cert_quota.js",
     "trusted-mode-check": "node dist/cli.js",
     "trusted-mode-check:mock": "node scripts/mock_pdp.js",
     "lint-docs-terminology": "python scripts/lint_docs_terminology.py"

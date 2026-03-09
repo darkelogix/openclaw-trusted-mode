@@ -17,6 +17,9 @@ describe('runtime certification', () => {
   });
 
   it('blocks high-risk shell tool when runtime is not certified', () => {
+    expect(shouldBlockToolForCertification('LOCKDOWN_ONLY', 'exec')).toBe(true);
+    expect(shouldBlockToolForCertification('UNSUPPORTED', 'exec')).toBe(true);
+    expect(shouldBlockToolForCertification('CERTIFIED_ENFORCED', 'exec')).toBe(false);
     expect(shouldBlockToolForCertification('LOCKDOWN_ONLY', 'execute_shell')).toBe(true);
     expect(shouldBlockToolForCertification('UNSUPPORTED', 'execute_shell')).toBe(true);
     expect(shouldBlockToolForCertification('CERTIFIED_ENFORCED', 'execute_shell')).toBe(false);

@@ -1,6 +1,7 @@
 export type RuntimeCertificationStatus = 'CERTIFIED_ENFORCED' | 'LOCKDOWN_ONLY' | 'UNSUPPORTED';
 
 const HIGH_RISK_TOOLS = new Set([
+  'exec',
   'execute_shell',
   'run_shell_command',
   'shell',

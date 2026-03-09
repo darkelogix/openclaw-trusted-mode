@@ -109,7 +109,7 @@ Exit criteria:
 
 ### Phase B - Build and Verify Plugin Release Candidate
 
-From `C:\dev\openclaw-trusted-mode`:
+From `<openclaw-trusted-mode-path>`:
 
 ```powershell
 npm ci
@@ -127,7 +127,7 @@ Expected outputs:
 
 ### Phase C - Security, Compatibility, and Performance Gates
 
-From `C:\dev\openclaw-trusted-mode`:
+From `<openclaw-trusted-mode-path>`:
 
 ```powershell
 mkdir security-artifacts -ErrorAction SilentlyContinue | Out-Null
@@ -156,7 +156,7 @@ Expected outputs:
 
 ### Phase D - Validate SDE Enterprise Runtime Bundle
 
-From `C:\dev\sde-enterprise`:
+From `<sde-enterprise-path>`:
 
 1. Validate artifact contract tests:
 ```powershell
@@ -272,3 +272,4 @@ Release is complete only when all are true:
 3. Security, compatibility, and performance evidence is bundled and linked.
 4. Enterprise runtime images and signed policy packs are distributed to intended channels.
 5. On-call/support window is active and first-day review completed.
+

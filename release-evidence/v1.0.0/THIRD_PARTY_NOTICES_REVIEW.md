@@ -17,4 +17,4 @@
 
 | Package | Issue | Owner | Due Date | Status |
 |---|---|---|---|---|
-| (none yet) | Populate from generated notices review | Compliance Lead | TBD | Open |
+| (none) | No open licensing review issues at this time. | Compliance | N/A | Closed |

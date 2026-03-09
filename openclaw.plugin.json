@@ -13,6 +13,8 @@
       "pdpTimeoutMs": { "type": "number", "default": 5000 },
       "failClosed": { "type": "boolean", "default": true },
       "tenantId": { "type": "string" },
+      "gatewayId": { "type": "string" },
+      "environment": { "type": "string" },
       "certificationStatus": {
         "type": "string",
         "enum": ["CERTIFIED_ENFORCED", "LOCKDOWN_ONLY", "UNSUPPORTED"],
@@ -27,17 +29,17 @@
       "highRiskTools": {
         "type": "array",
         "items": { "type": "string" },
-        "default": ["execute_shell", "run_shell_command", "shell", "delete_file", "remove_file", "write_file", "edit_file"]
+        "default": ["exec", "execute_shell", "run_shell_command", "shell", "delete_file", "remove_file", "write_file", "edit_file"]
       },
       "toolPolicyMode": {
         "type": "string",
         "enum": ["PDP", "ALLOWLIST_ONLY"],
-        "default": "PDP"
+        "default": "ALLOWLIST_ONLY"
       },
       "allowedTools": {
         "type": "array",
         "items": { "type": "string" },
-        "default": []
+        "default": ["read_file", "list_files", "search_files"]
       },
       "requireTenantId": {
         "type": "boolean",

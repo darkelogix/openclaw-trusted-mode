@@ -68,11 +68,20 @@ function main() {
     }
   }
 
-  if (props.toolPolicyMode.default !== 'PDP') {
-    fail('Schema default drift: toolPolicyMode.default should be PDP');
+  if (props.toolPolicyMode.default !== 'ALLOWLIST_ONLY') {
+    fail('Schema default drift: toolPolicyMode.default should be ALLOWLIST_ONLY for standalone safety');
+  }
+  if (
+    !Array.isArray(props.allowedTools.default) ||
+    props.allowedTools.default.join(',') !== 'read_file,list_files,search_files'
+  ) {
+    fail('Schema default drift: allowedTools.default should define the standalone free allowlist');
   }
   if (!Array.isArray(props.highRiskTools.default) || props.highRiskTools.default.length < 4) {
     fail('Schema default drift: highRiskTools.default should include baseline high-risk tools');
+  }
+  if (!props.highRiskTools.default.includes('exec')) {
+    fail('Schema default drift: highRiskTools.default must include exec');
   }
   if (props.failClosed.default !== true) {
     fail('Schema default drift: failClosed.default must be true');

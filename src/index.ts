@@ -1,5 +1,3 @@
-// src/index.ts — MAXIMUM DEBUG VERSION
-
 import type { BeforeToolCallResult, PluginApi, ToolCallEvent } from '@openclaw/core';
 import { enforceConstraints } from './constraints';
 import { curateContext, ContextCuratorConfig } from './contextCurator';
@@ -23,6 +21,8 @@ export default function register(api: PluginApi) {
     failClosed?: boolean;
     contextCurator?: ContextCuratorConfig;
     tenantId?: string;
+    gatewayId?: string;
+    environment?: string;
     certificationStatus?: RuntimeCertificationStatus;
     openclawVersion?: string;
     certifiedOpenClawVersions?: string[];
@@ -38,6 +38,8 @@ export default function register(api: PluginApi) {
   const failClosed = config.failClosed !== false;
   const contextCurator = config.contextCurator || {};
   const tenantId = config.tenantId;
+  const gatewayId = config.gatewayId;
+  const environment = config.environment;
   const certificationStatus = resolveRuntimeCertificationStatus(
     config.certificationStatus,
     config.openclawVersion,
@@ -54,17 +56,12 @@ export default function register(api: PluginApi) {
     tenantId,
   });
 
-  console.log(`[Trusted Mode DEBUG] Plugin registered! PDP = ${pdpUrl}`);
-  console.log(`[Trusted Mode DEBUG] Runtime certification status: ${certificationStatus}`);
-  console.log(`[Trusted Mode DEBUG] Tool policy mode: ${toolPolicyMode}`);
   if (!hardeningValidation.ok) {
     console.error(`[Trusted Mode ERROR] Hardening config invalid: ${hardeningValidation.issues.join('; ')}`);
   }
 
   const hook = 'before_tool_call';
   api.on(hook, async (event: ToolCallEvent): Promise<BeforeToolCallResult | void> => {
-    console.log(`[Trusted Mode DEBUG] 🔥 HOOK FIRED: ${hook} | Tool: "${event.toolName}"`);
-
     if (!hardeningValidation.ok) {
       return {
         block: true,
@@ -94,6 +91,8 @@ export default function register(api: PluginApi) {
       decision_sku: 'openclaw.trusted_mode.authorize.v1',
       policy_variant: policyVariant,
       tenant_id: tenantId,
+      gateway_id: gatewayId,
+      environment,
       inputs: {
         action_request: {
           tool_name: event.toolName,
@@ -107,7 +106,6 @@ export default function register(api: PluginApi) {
     const timeout = setTimeout(() => controller.abort(), pdpTimeoutMs);
 
     try {
-      console.log(`[Trusted Mode DEBUG] Sending to PDP:`, payload);
       const res = await fetch(pdpUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -115,12 +113,9 @@ export default function register(api: PluginApi) {
         signal: controller.signal
       });
 
-      console.log(`[Trusted Mode DEBUG] PDP response status: ${res.status}`);
-
       if (!res.ok) throw new Error(`PDP unreachable (${res.status})`);
 
       const decision = await res.json();
-      console.log(`[Trusted Mode DEBUG] PDP decision:`, decision);
 
       if (!decision || typeof decision.decision !== 'string') {
         throw new Error(`[Trusted Mode ERROR] Invalid PDP response: missing decision`);

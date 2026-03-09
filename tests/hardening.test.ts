@@ -28,7 +28,7 @@ describe('hardening config', () => {
 
   it('allows only listed tools in allowlist mode', () => {
     expect(isToolAllowedByPolicyMode('read_file', 'ALLOWLIST_ONLY', ['read_file'])).toBe(true);
-    expect(isToolAllowedByPolicyMode('execute_shell', 'ALLOWLIST_ONLY', ['read_file'])).toBe(false);
-    expect(isToolAllowedByPolicyMode('execute_shell', 'PDP', ['read_file'])).toBe(true);
+    expect(isToolAllowedByPolicyMode('exec', 'ALLOWLIST_ONLY', ['read_file'])).toBe(false);
+    expect(isToolAllowedByPolicyMode('exec', 'PDP', ['read_file'])).toBe(true);
   });
 });

@@ -1,0 +1,56 @@
+{
+  "capturedAtUtc": "2026-03-06T23:04:28.2871865Z",
+  "runId": "github-ubuntu-latest-20260306-230421",
+  "environmentLabel": "github-ubuntu-latest",
+  "openclawVersion": "smoke",
+  "certificationStatus": "LOCKDOWN_ONLY",
+  "repoRoot": "/home/runner/work/openclaw-trusted-mode/openclaw-trusted-mode",
+  "isolatedTempRoot": "/home/runner/work/openclaw-trusted-mode/openclaw-trusted-mode/.clean-room/github-ubuntu-latest-20260306-230421",
+  "overallStatus": "passed",
+  "steps": [
+    {
+      "name": "build",
+      "status": "passed",
+      "optional": false,
+      "startedAtUtc": "2026-03-06T23:04:21.7141648Z",
+      "completedAtUtc": "2026-03-06T23:04:23.8169144Z"
+    },
+    {
+      "name": "verify_plugin_schema_contract",
+      "status": "passed",
+      "optional": false,
+      "startedAtUtc": "2026-03-06T23:04:23.8229384Z",
+      "completedAtUtc": "2026-03-06T23:04:23.8529955Z"
+    },
+    {
+      "name": "test",
+      "status": "passed",
+      "optional": false,
+      "startedAtUtc": "2026-03-06T23:04:23.8548872Z",
+      "completedAtUtc": "2026-03-06T23:04:25.3661244Z"
+    },
+    {
+      "name": "package_dry_run",
+      "status": "passed",
+      "optional": false,
+      "startedAtUtc": "2026-03-06T23:04:25.3665002Z",
+      "completedAtUtc": "2026-03-06T23:04:25.8665758Z"
+    },
+    {
+      "name": "startup_health_check",
+      "status": "warning",
+      "optional": true,
+      "startedAtUtc": "2026-03-06T23:04:25.8670197Z",
+      "completedAtUtc": "2026-03-06T23:04:25.9784504Z",
+      "detail": "Native command exited with code 1"
+    },
+    {
+      "name": "openclaw_plugin_info",
+      "status": "warning",
+      "optional": true,
+      "startedAtUtc": "2026-03-06T23:04:25.9819809Z",
+      "completedAtUtc": "2026-03-06T23:04:28.2848889Z",
+      "detail": "The term 'openclaw' is not recognized as a name of a cmdlet, function, script file, or executable program.\nCheck the spelling of the name, or if a path was included, verify that the path is correct and try again."
+    }
+  ]
+}

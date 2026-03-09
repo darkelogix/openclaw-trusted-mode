@@ -10,23 +10,32 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 
 This guide is the single entrypoint for first-time users of:
 
-- `C:\dev\openclaw-trusted-mode` (plugin)
-- `C:\dev\sde-enterprise` (Strategic Decision Engine (SDE) Policy Decision Point (PDP) runtime)
+- `<openclaw-trusted-mode-path>` (plugin)
+- `<sde-enterprise-path>` (Strategic Decision Engine (SDE) Policy Decision Point (PDP) runtime)
 
 Goal: download, install, configure, test, and run without direct support.
 
-Org-specific values are centralized in `C:\dev\ORG_VALUES.md`.
+There are two valid setup paths:
+
+- Free standalone plugin hardening:
+  - local allowlist-only mode
+  - no SDE PDP required
+- SDE-backed governed mode:
+  - requires `<sde-enterprise-path>`
+  - adds PDP authorization, signed policy packs, and entitlements
+
+Org-specific values are centralized in `<org-values-file>`.
 
 ## 0) One-command bootstrap (recommended)
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\dev\bootstrap_self_service.ps1
+powershell -ExecutionPolicy Bypass -File <bootstrap-self-service-script-path>
 ```
 
 Optional (also install `sde-cli`):
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\dev\bootstrap_self_service.ps1 -InstallSdeCli
+powershell -ExecutionPolicy Bypass -File <bootstrap-self-service-script-path> -InstallSdeCli
 ```
 
 ## 1) Prerequisites
@@ -52,14 +61,14 @@ openclaw --version
 
 Option A: you already have them locally at:
 
-- `C:\dev\openclaw-trusted-mode`
-- `C:\dev\sde-enterprise`
+- `<openclaw-trusted-mode-path>`
+- `<sde-enterprise-path>`
 
 Option B: clone them:
 
 ```powershell
-git clone ORG_OPENCLAW_TRUSTED_MODE_REPO_URL C:\dev\openclaw-trusted-mode
-git clone ORG_SDE_ENTERPRISE_REPO_URL C:\dev\sde-enterprise
+git clone <openclaw-trusted-mode-repo-url> <openclaw-trusted-mode-path>
+git clone <sde-enterprise-repo-url> <sde-enterprise-path>
 ```
 
 ## 3) Configure known-good local defaults
@@ -67,21 +76,43 @@ git clone ORG_SDE_ENTERPRISE_REPO_URL C:\dev\sde-enterprise
 1. Create local SDE env file:
 
 ```powershell
-Copy-Item C:\dev\sde-enterprise\.env.example C:\dev\sde-enterprise\.env -Force
+Copy-Item <sde-enterprise-path>\.env.example <sde-enterprise-path>\.env -Force
 ```
 
 2. Use the default tenant/policy mapping (already present in repo):
-- `C:\dev\sde-enterprise\ops\entitlements.json`
-- `C:\dev\sde-enterprise\ops\tenant_variants.json`
+- `<sde-enterprise-path>\ops\entitlements.json`
+- `<sde-enterprise-path>\ops\tenant_variants.json`
 
 3. Optional plugin config template:
-- `C:\dev\openclaw-trusted-mode\openclaw.user-config.entry.example.json`
+- `<openclaw-trusted-mode-path>\openclaw.user-config.entry.example.json`
 
-## 4) Build and run SDE PDP (Policy Decision Point)
+## 4) Free standalone plugin install
+
+Use this path if you want practical local hardening without SDE PDP.
 
 ```powershell
-Set-Location C:\dev\sde-enterprise
-docker compose -f ops/docker-compose.pdp.yml up --build -d
+Set-Location <openclaw-trusted-mode-path>
+npm install
+npm run build
+openclaw plugins install <openclaw-trusted-mode-path> --no-color
+openclaw plugins info openclaw-trusted-mode --no-color
+```
+
+Expected: plugin status is `loaded`.
+
+Default free posture:
+
+- `toolPolicyMode = ALLOWLIST_ONLY`
+- `allowedTools = ["read_file", "list_files", "search_files"]`
+- shell/write/delete tools blocked locally
+
+## 5) Build and run SDE PDP (Policy Decision Point)
+
+Use the hardened profile for all production-style and release validation runs.
+
+```powershell
+Set-Location <sde-enterprise-path>
+docker compose -f ops/docker-compose.pdp.yml -f ops/docker-compose.pdp.hardened.yml up --build -d
 ```
 
 Verify health:
@@ -96,46 +127,55 @@ Expected:
 {"status":"ok"}
 ```
 
-## 5) Build and install plugin
+## 6) Build and install plugin for SDE-backed mode
 
 ```powershell
-Set-Location C:\dev\openclaw-trusted-mode
+Set-Location <openclaw-trusted-mode-path>
 npm install
 npm run build
-openclaw plugins install C:\dev\openclaw-trusted-mode --no-color
+openclaw plugins install <openclaw-trusted-mode-path> --no-color
 openclaw plugins info openclaw-trusted-mode --no-color
 ```
 
 Expected: plugin status is `loaded`.
 
-## 6) Run first-success smoke tests
+## 7) Run first-success smoke tests
 
-Run SDE smoke test:
+Standalone free-mode smoke test:
+
+1. Confirm `read_file` still works in OpenClaw.
+2. Confirm high-risk actions such as `exec` are blocked.
+
+SDE-backed smoke test:
 
 ```powershell
-Set-Location C:\dev\sde-enterprise
+Set-Location <sde-enterprise-path>
 powershell -ExecutionPolicy Bypass -File scripts\first_success_smoke.ps1
 ```
 
 Run plugin startup health:
 
 ```powershell
-Set-Location C:\dev\openclaw-trusted-mode
+Set-Location <openclaw-trusted-mode-path>
 powershell -ExecutionPolicy Bypass -File scripts\first_success_smoke.ps1
 ```
 
-## 7) Day-2 operations docs
+## 8) Day-2 operations docs
 
-- Primary technical ops: `C:\dev\openclaw-trusted-mode\OPERATIONS_GUIDE.md`
-- Non-technical runbook: `C:\dev\openclaw-trusted-mode\RUNBOOK_NON_TECHNICAL.md`
-- SDE deployment docs: `C:\dev\sde-enterprise\README.md`
+- Primary technical ops: `<openclaw-trusted-mode-path>\OPERATIONS_GUIDE.md`
+- Non-technical runbook: `<openclaw-trusted-mode-path>\RUNBOOK_NON_TECHNICAL.md`
+- SDE deployment docs: `<sde-enterprise-path>\README.md`
 
-## 8) Remaining org-specific values to fill once
+## 9) Remaining org-specific values to fill once
 
-For full production self-service, fill these once and publish internally:
+For full production self-service, define these values once in your operations documentation:
 
-1. `ORG_OPENCLAW_TRUSTED_MODE_REPO_URL`
-2. `ORG_SDE_ENTERPRISE_REPO_URL`
-3. `ORG_LICENSE_SERVER_FQDN`
+1. `<openclaw-trusted-mode-repo-url>`
+2. `<sde-enterprise-repo-url>`
+3. `<license-server-fqdn>`
 4. Support contact block (owner/channel/email)
 5. Private registry/image coordinates (if used)
+
+These values are release-ops inputs, not blockers for local build/test validation.
+
+

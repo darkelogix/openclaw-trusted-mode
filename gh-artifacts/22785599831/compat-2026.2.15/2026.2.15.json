@@ -1,0 +1,47 @@
+
+> openclaw-trusted-mode@1.0.0 trusted-mode-check
+> node dist/cli.js --json
+
+{
+  "status": "ENFORCED_OK",
+  "policy_variant": "guard-pro.v2026.02",
+  "pdp_url": "http://localhost:8001/v1/authorize",
+  "tenant_id": "trial-tenant",
+  "trace_id": "tmc-817845d7-f7da-43bb-8480-9a3ffda33d3a",
+  "openclaw_version": "2026.2.15",
+  "runtime_certification_status": "CERTIFIED_ENFORCED",
+  "attestation_pack_version": "v1.0.0",
+  "attestation_signature_verified": true,
+  "axis_scores": {
+    "interception_proof": "PASS",
+    "fail_safe_posture": "PASS",
+    "integrity": "PASS",
+    "certified_compatibility": "PASS"
+  },
+  "checks": [
+    {
+      "id": "attestation_pack_signature",
+      "ok": true,
+      "detail": "verified (v1.0.0)"
+    },
+    {
+      "id": "deny_high_impact",
+      "ok": true,
+      "detail": "HIGH_BLAST deny verified"
+    },
+    {
+      "id": "allow_low_impact",
+      "ok": true,
+      "detail": "allow decision verified"
+    },
+    {
+      "id": "signature_failure",
+      "ok": true,
+      "detail": "signature failure path denied"
+    }
+  ],
+  "remediation": [
+    "No remediation required."
+  ],
+  "generated_at": "2026-03-06T23:04:19.294Z"
+}

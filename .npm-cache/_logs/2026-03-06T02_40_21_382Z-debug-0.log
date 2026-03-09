@@ -1,0 +1,68 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.2.3
+2 info using node@v20.10.0
+3 timing npm:load:whichnode Completed in 8ms
+4 timing config:load:defaults Completed in 3ms
+5 timing config:load:file:C:\Program Files\nodejs\node_modules\npm\npmrc Completed in 7ms
+6 timing config:load:builtin Completed in 7ms
+7 timing config:load:cli Completed in 6ms
+8 timing config:load:env Completed in 2ms
+9 timing config:load:file:C:\dev\openclaw-trusted-mode\.npmrc Completed in 1ms
+10 timing config:load:project Completed in 3ms
+11 timing config:load:file:C:\Users\MikeDarke\.npmrc Completed in 0ms
+12 timing config:load:user Completed in 1ms
+13 timing config:load:file:C:\Users\MikeDarke\AppData\Roaming\npm\etc\npmrc Completed in 0ms
+14 timing config:load:global Completed in 0ms
+15 timing config:load:setEnvs Completed in 1ms
+16 timing config:load Completed in 24ms
+17 timing npm:load:configload Completed in 25ms
+18 timing config:load:flatten Completed in 7ms
+19 timing npm:load:mkdirpcache Completed in 1ms
+20 timing npm:load:mkdirplogs Completed in 0ms
+21 verbose title npm pack
+22 verbose argv "pack" "--cache" ".npm-cache"
+23 timing npm:load:setTitle Completed in 6ms
+24 timing npm:load:display Completed in 1ms
+25 verbose logfile logs-max:10 dir:C:\dev\openclaw-trusted-mode\.npm-cache\_logs\2026-03-06T02_40_21_382Z-
+26 verbose logfile C:\dev\openclaw-trusted-mode\.npm-cache\_logs\2026-03-06T02_40_21_382Z-debug-0.log
+27 timing npm:load:logFile Completed in 17ms
+28 timing npm:load:timers Completed in 1ms
+29 timing npm:load:configScope Completed in 0ms
+30 timing npm:load Completed in 132ms
+31 silly logfile done cleaning log files
+32 timing arborist:ctor Completed in 1ms
+33 timing arborist:ctor Completed in 0ms
+34 notice
+35 notice package: openclaw-trusted-mode@1.0.0
+36 notice === Tarball Contents ===
+37 notice 2.5kB CHANGELOG.md                           
+37 notice 2.8kB GLOSSARY.md                            
+37 notice 1.1kB LICENSE                                
+37 notice 4.1kB README.md                              
+37 notice 3.3kB SELF_SERVICE_FAQ.md                    
+37 notice 3.8kB START_HERE.md                          
+37 notice 490B  attestation/trusted_mode_attest_v1.json
+37 notice 71B   attestation/trusted_mode_attest_v1.sig 
+37 notice 2.9kB dist/attestation.js                    
+37 notice 967B  dist/constraints.js                    
+37 notice 2.1kB dist/contextCurator.js                 
+37 notice 1.9kB dist/hardening.js                      
+37 notice 4.8kB dist/index.js                          
+37 notice 2.4kB dist/runtimeCertification.js           
+37 notice 2.1kB openclaw.plugin.json                   
+37 notice 466B  openclaw.user-config.entry.example.json
+37 notice 2.2kB package.json                           
+38 notice === Tarball Details ===
+39 notice name:          openclaw-trusted-mode                   
+39 notice version:       1.0.0                                   
+39 notice filename:      openclaw-trusted-mode-1.0.0.tgz         
+39 notice package size:  11.7 kB                                 
+39 notice unpacked size: 38.0 kB                                 
+39 notice shasum:        dcb2a7ffb442848facc8655f56745acbb88b3efa
+39 notice integrity:     sha512-mMyoPLAGyEViQ[...]V8/l8m4VnYLkg==
+39 notice total files:   17                                      
+40 notice
+41 timing command:pack Completed in 546ms
+42 verbose exit 0
+43 timing npm Completed in 1833ms
+44 info ok
