@@ -1,34 +1,29 @@
 # Performance Baseline
 
-Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
-
-## Acronym Expansions
-
-- `PDP`: Policy Decision Point
-- `CI`: Continuous Integration
+Generated at: 2026-03-09T21:18:58.559Z
 
 ## PDP Latency
 
 | Metric | Value |
 |---|---|
 | Sample Count | 120 |
-| Avg (ms) | 1.643 |
-| Min (ms) | 0.997 |
-| p50 (ms) | 1.456 |
-| p95 (ms) | 2.565 |
-| Max (ms) | 3.791 |
+| Avg (ms) | 15.201 |
+| Min (ms) | 6.784 |
+| p50 (ms) | 14.604 |
+| p95 (ms) | 36.05 |
+| Max (ms) | 52.386 |
 
 ## Interception Overhead
 
 | Metric | Value |
 |---|---|
 | Iterations | 20000 |
-| Total (ms) | 87.403 |
-| Avg per intercept (ms) | 0.004 |
+| Total (ms) | 238.854 |
+| Avg per intercept (ms) | 0.012 |
 
 ## Recommended Timeout Review
 
-Configured timeout should remain above p95 with safety margin (current p95: 2.565 ms).
+Configured timeout should remain above p95 with safety margin (current p95: 36.05 ms).
 
 ## Notes
 
