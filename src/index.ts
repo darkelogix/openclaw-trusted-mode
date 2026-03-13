@@ -82,6 +82,10 @@ export default function register(api: PluginApi) {
       return { block: true, blockReason: certificationBlockReason(certificationStatus, event.toolName) };
     }
 
+    if (toolPolicyMode === 'ALLOWLIST_ONLY') {
+      return;
+    }
+
     const { summary: contextSummary } = curateContext(
       { tool_name: event.toolName, params: event.params || {} },
       contextCurator
@@ -115,7 +119,12 @@ export default function register(api: PluginApi) {
 
       if (!res.ok) throw new Error(`PDP unreachable (${res.status})`);
 
-      const decision = await res.json();
+      let decision;
+      try {
+        decision = await res.json();
+      } catch {
+        throw new Error('[Trusted Mode ERROR] Invalid PDP response: malformed JSON');
+      }
 
       if (!decision || typeof decision.decision !== 'string') {
         throw new Error(`[Trusted Mode ERROR] Invalid PDP response: missing decision`);
