@@ -83,6 +83,26 @@ describe('trusted mode plugin', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it('surfaces SDE guidance when governed mode points at a missing local PDP', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('fetch failed')));
+
+    const { api, getHandler } = createApi({
+      toolPolicyMode: 'PDP',
+      failClosed: true,
+      certificationStatus: 'CERTIFIED_ENFORCED',
+      tenantId: 'trial-tenant',
+    });
+
+    register(api as never);
+    const result = await getHandler()({ toolName: 'read_file', params: { path: 'README.md' } });
+
+    expect(result).toEqual({
+      block: true,
+      blockReason: expect.stringContaining('licensed SDE runtime'),
+    });
+    expect((result as { blockReason: string }).blockReason).toContain('ALLOWLIST_ONLY');
+  });
+
   it('fails closed when the PDP returns malformed JSON', async () => {
     const { server, url } = await startMockPdpServer((_req, res) => {
       res.writeHead(200, { 'content-type': 'application/json' });

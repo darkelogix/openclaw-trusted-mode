@@ -42,6 +42,7 @@
     "dist/hardening.js",
     "dist/index.js",
     "dist/runtimeCertification.js",
+    "dist/sdeGuidance.js",
     "openclaw.plugin.json",
     "openclaw.user-config.entry.example.json",
     "README.md",

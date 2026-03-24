@@ -14,11 +14,19 @@ Documentation index (by audience and task): [`docs/README.md`](./docs/README.md)
 
 ## npm Package
 
-The MIT adapter/plugin package is prepared for npm publication as:
+Install the public MIT adapter/plugin package with:
 
 ```bash
 npm install @darkelogix/openclaw-trusted-mode
 ```
+
+## What `npm install` gives you
+
+`npm install @darkelogix/openclaw-trusted-mode` gives you the MIT adapter/plugin layer and standalone hardening flow only. It does not grant access to the proprietary SDE runtime, enterprise deployment packs, or governed tenant entitlements.
+
+## Need governed mode?
+
+If you want SDE-backed governed mode, obtain your licensed SDE runtime and deployment instructions from the Darkelogix customer console. Use the public npm package for adapter installation, then connect it to your licensed SDE environment for governed authorization, evidence, and rollout controls.
 
 The npm package contains the MIT plugin files and standalone hardening logic only.
 It does not include the proprietary `sde-enterprise` runtime.
@@ -60,6 +68,13 @@ For governed release declaration, see [`RELEASE_v1.0.0.md`](./RELEASE_v1.0.0.md)
 - Supports fail-closed (default) or fail-open behavior.
 
 ## Free vs Paid
+
+The product boundary should be explicit at install time:
+
+- `npm install` gets you the adapter/plugin and standalone hardening path
+- governed mode requires a separately licensed SDE deployment
+- the customer console is the supported way to obtain governed runtime artifacts and deployment instructions
+
 
 - Free standalone use:
   - useful as a local hardening layer

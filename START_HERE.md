@@ -1,5 +1,11 @@
 # Start Here: Self-Service Setup
 
+This guide assumes an npm-first customer path:
+
+- install the public adapter/plugin from npm
+- use standalone mode immediately if you only need local hardening
+- obtain the licensed SDE runtime and deployment materials through the Darkelogix customer console only if you want governed mode
+
 Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 
 ## Acronym Expansions
@@ -17,6 +23,11 @@ Goal: download, install, configure, test, and run without direct support.
 
 There are two valid setup paths:
 
+- npm package: public adapter/plugin only
+- customer console: licensed SDE runtime, deployment bundles, and governed rollout instructions
+
+Then choose one of these runtime paths:
+
 - Free standalone plugin hardening:
   - local allowlist-only mode
   - no SDE PDP required
@@ -27,6 +38,15 @@ There are two valid setup paths:
 Org-specific values are centralized in `<org-values-file>`.
 
 ## 0) One-command bootstrap (recommended)
+
+If you are coming from the public npm package, you can install it first with:
+
+```powershell
+npm install @darkelogix/openclaw-trusted-mode
+```
+
+Use the bootstrap path when you want the guided local setup flow.
+
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File <bootstrap-self-service-script-path>
@@ -107,6 +127,9 @@ Default free posture:
 - shell/write/delete tools blocked locally
 
 ## 5) Build and run SDE PDP (Policy Decision Point)
+
+Use this governed path only after you have licensed access to SDE. The supported customer-facing way to obtain the runtime, bundles, and instructions is through the Darkelogix customer console, not by assuming direct source-repo access.
+
 
 Use the hardened profile for all production-style and release validation runs.
 

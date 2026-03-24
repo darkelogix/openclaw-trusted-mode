@@ -12,6 +12,7 @@ import {
   normalizeToolPolicyMode,
   validateHardeningConfig,
 } from './hardening';
+import { maybeAppendSdeRuntimeGuidance } from './sdeGuidance';
 
 export default function register(api: PluginApi) {
   const config = api.config as {
@@ -140,10 +141,11 @@ export default function register(api: PluginApi) {
         return { params: event.params || {} };
       }
     } catch (err: any) {
-      const msg = err?.name === 'AbortError' ? `PDP timeout after ${pdpTimeoutMs}ms` : err?.message;
+      const baseMsg = err?.name === 'AbortError' ? `PDP timeout after ${pdpTimeoutMs}ms` : err?.message || 'PDP authorization failed';
+      const msg = maybeAppendSdeRuntimeGuidance(baseMsg, pdpUrl);
       console.error(`[Trusted Mode ERROR]`, msg);
       if (failClosed) {
-        return { block: true, blockReason: `[Trusted Mode BLOCKED] ${msg || 'PDP authorization failed'}` };
+        return { block: true, blockReason: `[Trusted Mode BLOCKED] ${msg}` };
       }
       console.warn(`[Trusted Mode WARN] Fail-open enabled; allowing tool call.`);
     } finally {

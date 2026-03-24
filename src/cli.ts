@@ -9,6 +9,7 @@ import {
   normalizeRuntimeCertificationStatus,
   RuntimeCertificationStatus,
 } from './runtimeCertification';
+import { isLocalPdpUrl, maybeAppendSdeRuntimeGuidance } from './sdeGuidance';
 
 type DecisionResponse = {
   decision: 'allow' | 'deny';
@@ -68,15 +69,20 @@ const JSON_MODE = process.argv.includes('--json');
 const EXPECTED_STATUS = process.env.EXPECTED_STATUS;
 
 async function post(payload: unknown): Promise<DecisionResponse> {
-  const res = await fetch(PDP_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) {
-    throw new Error(`PDP unreachable (${res.status})`);
+  try {
+    const res = await fetch(PDP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      throw new Error(`PDP unreachable (${res.status})`);
+    }
+    return (await res.json()) as DecisionResponse;
+  } catch (err: any) {
+    const detail = err?.name === 'AbortError' ? 'PDP timeout' : err?.message || String(err);
+    throw new Error(maybeAppendSdeRuntimeGuidance(detail, PDP_URL));
   }
-  return (await res.json()) as DecisionResponse;
 }
 
 async function testDenyHighImpact(): Promise<CheckResult> {
@@ -168,7 +174,8 @@ function deriveStatus(
 
 function remediationFor(
   status: AttestationStatus,
-  runtimeCertificationStatus: RuntimeCertificationStatus
+  runtimeCertificationStatus: RuntimeCertificationStatus,
+  hasConnectivityFailure: boolean
 ): string[] {
   if (status === 'ENFORCED_OK') return ['No remediation required.'];
   if (runtimeCertificationStatus !== 'CERTIFIED_ENFORCED') {
@@ -184,11 +191,18 @@ function remediationFor(
       'Re-run trusted-mode-check after remediation.',
     ];
   }
-  return [
+  const steps = [
     'Restore PDP reachability and verify /healthz.',
     'Confirm plugin pdpUrl and tenant configuration.',
     'Keep fail-closed enabled until ENFORCED_OK is restored.',
   ];
+  if (hasConnectivityFailure && isLocalPdpUrl(PDP_URL)) {
+    steps.unshift(
+      'If you only need standalone hardening, switch the plugin to ALLOWLIST_ONLY.',
+      'If you want governed mode, obtain the licensed SDE runtime and deployment instructions from the Darkelogix customer console, then point PDP_URL at that environment.'
+    );
+  }
+  return steps;
 }
 
 function computeAxisScores(
@@ -233,6 +247,7 @@ async function main() {
     testSignatureFailure(),
   ]);
 
+  const anyConnectivityFailure = checks.some((r) => r.detail.includes('PDP unreachable') || r.detail.includes('fetch failed') || r.detail.includes('timeout') || r.detail.includes('aborted'));
   const status =
     RUNTIME_CERTIFICATION_STATUS === 'CERTIFIED_ENFORCED'
       ? deriveStatus(checks, RUNTIME_CERTIFICATION_STATUS)
@@ -250,7 +265,7 @@ async function main() {
     attestation_signature_verified: packVerification.signatureVerified,
     axis_scores: axisScores,
     checks,
-    remediation: remediationFor(status, RUNTIME_CERTIFICATION_STATUS),
+    remediation: remediationFor(status, RUNTIME_CERTIFICATION_STATUS, anyConnectivityFailure),
     generated_at: new Date().toISOString(),
   };
 
