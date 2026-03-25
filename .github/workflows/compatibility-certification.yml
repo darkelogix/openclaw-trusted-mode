@@ -19,8 +19,8 @@ jobs:
             certification_status: LOCKDOWN_ONLY
             expected_status: LOCKDOWN_ONLY
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -37,11 +37,11 @@ jobs:
           PDP_URL=http://localhost:8001/v1/authorize \
           npm run trusted-mode-check -- --json > compat-results/${{ matrix.openclaw_version }}.json
           cp compat-results/${{ matrix.openclaw_version }}.json release-evidence/matrix/runs/github-ubuntu-${{ matrix.openclaw_version }}.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: compat-${{ matrix.openclaw_version }}
           path: compat-results/${{ matrix.openclaw_version }}.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: matrix-run-${{ matrix.openclaw_version }}
           path: release-evidence/matrix/runs/github-ubuntu-${{ matrix.openclaw_version }}.json
@@ -50,8 +50,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: certify
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -63,7 +63,7 @@ jobs:
           path: compat-results
       - run: npm run update-compatibility-matrix
       - run: npm run verify-compatibility-matrix
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: compatibility-matrix
           path: COMPATIBILITY_MATRIX.md

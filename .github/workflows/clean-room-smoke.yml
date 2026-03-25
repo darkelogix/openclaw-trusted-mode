@@ -16,14 +16,14 @@ jobs:
       run:
         shell: pwsh
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
       - run: npm ci
       - run: ./scripts/run_clean_room_smoke.ps1 -EnvironmentLabel github-${{ matrix.os }} -OpenClawVersion smoke
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: openclaw-clean-room-${{ matrix.os }}
           path: release-evidence/matrix/runs/*.json

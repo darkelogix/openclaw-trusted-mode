@@ -11,8 +11,8 @@ jobs:
   benchmark:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -22,7 +22,7 @@ jobs:
           node scripts/mock_pdp.js &
           sleep 1
           PDP_URL=http://localhost:8001/v1/authorize npm run performance-benchmark
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: performance-benchmark
           path: |
