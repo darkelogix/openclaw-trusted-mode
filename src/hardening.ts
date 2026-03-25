@@ -14,10 +14,10 @@ export type HardeningValidation = {
 };
 
 export function normalizeToolPolicyMode(value: unknown): ToolPolicyMode {
-  if (typeof value !== 'string') return 'PDP';
+  if (typeof value !== 'string') return 'ALLOWLIST_ONLY';
   const normalized = value.trim().toUpperCase();
-  if (normalized === 'ALLOWLIST_ONLY') return 'ALLOWLIST_ONLY';
-  return 'PDP';
+  if (normalized === 'PDP') return 'PDP';
+  return 'ALLOWLIST_ONLY';
 }
 
 export function validateHardeningConfig(config: HardeningConfig): HardeningValidation {

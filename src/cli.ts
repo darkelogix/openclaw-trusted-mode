@@ -199,7 +199,7 @@ function remediationFor(
   if (hasConnectivityFailure && isLocalPdpUrl(PDP_URL)) {
     steps.unshift(
       'If you only need standalone hardening, switch the plugin to ALLOWLIST_ONLY.',
-      'If you want governed mode, obtain the licensed SDE runtime and deployment instructions from the Darkelogix customer console, then point PDP_URL at that environment.'
+      'If you want governed mode, obtain the licensed SDE runtime and deployment instructions from https://darkelogix.ai/, then point PDP_URL at that environment.'
     );
   }
   return steps;

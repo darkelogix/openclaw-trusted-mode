@@ -6,8 +6,9 @@ import {
 } from '../src/hardening';
 
 describe('hardening config', () => {
-  it('normalizes tool policy mode with PDP default', () => {
-    expect(normalizeToolPolicyMode(undefined)).toBe('PDP');
+  it('normalizes tool policy mode with ALLOWLIST_ONLY default', () => {
+    expect(normalizeToolPolicyMode(undefined)).toBe('ALLOWLIST_ONLY');
+    expect(normalizeToolPolicyMode('PDP')).toBe('PDP');
     expect(normalizeToolPolicyMode('ALLOWLIST_ONLY')).toBe('ALLOWLIST_ONLY');
   });
 
