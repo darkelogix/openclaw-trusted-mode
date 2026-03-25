@@ -8,6 +8,8 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 - `PDP`: Policy Decision Point
 - `CLI`: Command Line Interface
 - `FQDN`: Fully Qualified Domain Name
+- `SKU`: Stock Keeping Unit
+- `WSL`: Windows Subsystem for Linux
 
 ## 1) `openclaw` command not found
 

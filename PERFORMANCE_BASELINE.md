@@ -1,6 +1,13 @@
 # Performance Baseline
 
+Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
+
 Generated at: 2026-03-09T21:18:58.559Z
+
+## Acronym Expansions
+
+- `PDP`: Policy Decision Point
+- `CI`: Continuous Integration
 
 ## PDP Latency
 

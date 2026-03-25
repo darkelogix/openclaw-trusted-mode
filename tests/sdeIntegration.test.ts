@@ -7,6 +7,9 @@ import { startLiveSdePdp } from './liveSdeHarness';
 
 type RegisteredHook = (event: { toolName: string; params?: Record<string, unknown> }) => Promise<unknown>;
 
+const runLiveSdeIntegration = process.env.RUN_LIVE_SDE_INTEGRATION === '1';
+const liveSdeDescribe = runLiveSdeIntegration ? describe : describe.skip;
+
 function createApi(config: Record<string, unknown>) {
   let handler: RegisteredHook | undefined;
 
@@ -28,10 +31,11 @@ function createApi(config: Record<string, unknown>) {
   };
 }
 
-describe('live SDE integration', () => {
+liveSdeDescribe('live SDE integration', () => {
   const servers: Array<{ stop: () => Promise<void> }> = [];
   const tempDirs: string[] = [];
 
+  // These tests require a locally runnable SDE repo and Python runtime.
   afterEach(async () => {
     while (servers.length > 0) {
       await servers.pop()!.stop();

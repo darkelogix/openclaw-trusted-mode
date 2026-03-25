@@ -1,5 +1,11 @@
 # npm Publishing Checklist
 
+Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
+
+## Acronym Expansions
+
+- `SDE`: Strategic Decision Engine
+
 ## Package
 
 - npm package name: `@darkelogix/openclaw-trusted-mode`
