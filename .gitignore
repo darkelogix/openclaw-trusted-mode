@@ -24,3 +24,9 @@ Thumbs.db
 # Python caches (used by helper scripts)
 __pycache__/
 .pytest_cache/
+
+# Local validation artifacts
+.clean-room/
+.npm-cache/
+release-evidence/matrix/runs/*.json
+!release-evidence/matrix/runs/.gitkeep
