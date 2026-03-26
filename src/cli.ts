@@ -10,6 +10,7 @@ import {
   RuntimeCertificationStatus,
 } from './runtimeCertification';
 import { isLocalPdpUrl, maybeAppendSdeRuntimeGuidance } from './sdeGuidance';
+import { resolveOpenClawVersion } from './packageVersion';
 
 type DecisionResponse = {
   decision: 'allow' | 'deny';
@@ -61,7 +62,7 @@ type AttestationReport = {
 const PDP_URL = process.env.PDP_URL || 'http://localhost:8001/v1/authorize';
 const POLICY_VARIANT = process.env.POLICY_VARIANT || 'guard-pro.v2026.02';
 const TENANT_ID = process.env.TENANT_ID || 'trial-tenant';
-const OPENCLAW_VERSION = process.env.OPENCLAW_VERSION || 'unknown';
+const OPENCLAW_VERSION = resolveOpenClawVersion();
 const RUNTIME_CERTIFICATION_STATUS = normalizeRuntimeCertificationStatus(
   process.env.CERTIFICATION_STATUS || 'CERTIFIED_ENFORCED'
 );

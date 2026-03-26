@@ -41,6 +41,7 @@
     "dist/contextCurator.js",
     "dist/hardening.js",
     "dist/index.js",
+    "dist/packageVersion.js",
     "dist/runtimeCertification.js",
     "dist/sdeGuidance.js",
     "openclaw.plugin.json",
