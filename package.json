@@ -8,12 +8,12 @@
     ".": "./dist/index.js"
   },
   "bin": {
-    "openclaw-trusted-mode-check": "./dist/cli.js"
+    "openclaw-trusted-mode-check": "dist/cli.js"
   },
   "homepage": "https://www.darkelogix.ai/openclaw/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/darkelogix/openclaw-trusted-mode.git"
+    "url": "git+https://github.com/darkelogix/openclaw-trusted-mode.git"
   },
   "bugs": {
     "url": "https://www.darkelogix.ai/contact/"
