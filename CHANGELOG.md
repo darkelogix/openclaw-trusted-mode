@@ -29,6 +29,10 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 - Add enterprise TCTP/EVTP validation matrix runner (`npm run test-pack-matrix`) against live PDP.
 - Add release documentation for deterministic certification proof (`decision_proof`) vs timestamped operational `outcome_event`.
 
+## v1.0.1
+- normalize constrained paths before prefix enforcement so `/tmp-evil`, traversal segments, and Windows path-prefix collisions do not bypass policy
+- add regression coverage for path normalization and descendant-boundary checks
+
 ## v1.0.0
 - Add Trusted Mode Check CLI (Node) with mock PDP for CI.
 - Add CI workflow to run build, tests, and CLI against mock PDP.

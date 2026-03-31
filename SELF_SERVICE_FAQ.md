@@ -71,7 +71,7 @@ If you are using standalone free mode, check these first:
 
 1. Confirm `toolPolicyMode` is `ALLOWLIST_ONLY`.
 2. Confirm the blocked tool is not present in `allowedTools`.
-3. For shell execution, verify the runtime tool name is `exec`.
+3. For shell execution, the runtime commonly emits `exec`; current SDE governance canonicalizes `exec`, `execute_shell`, and `run_shell_command` to the same shell policy, but verifying the observed tool id is still useful for troubleshooting.
 
 Run SDE smoke test:
 

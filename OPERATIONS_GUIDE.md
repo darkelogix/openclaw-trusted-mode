@@ -403,8 +403,9 @@ Current example policy format:
 
 Important:
 - Rules are keyed by `tool_name` received by PDP.
-- If your OpenClaw tool call arrives as `exec` (not `execute_shell`), `execute_shell` rule will not match.
-- In that case add a rule for `exec`:
+- Current SDE builds canonicalize common aliases such as `exec`, `run_shell_command`, and `shell` to the governed `execute_shell` rule before evaluation.
+- Production packs should still use `default: deny` and explicitly list allowed tools, even though the current runtime now fails closed for unmapped tools.
+- If you want an explicit pack entry for the raw runtime alias, you can still add one:
 
 ```json
 "exec": {

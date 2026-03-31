@@ -17,6 +17,34 @@ describe('enforceConstraints', () => {
     expect(() => enforceConstraints(params, constraints)).toThrow(/Constraint violation/);
   });
 
+  it('blocks prefix-collision paths that only share a string prefix', () => {
+    const params = { path: '/tmp-evil/file.txt' };
+    const constraints = [{ key: 'path', allowed_prefixes: ['/tmp'] }];
+
+    expect(() => enforceConstraints(params, constraints)).toThrow(/Constraint violation/);
+  });
+
+  it('blocks path traversal outside the allowed prefix', () => {
+    const params = { path: '/safe/../etc/passwd' };
+    const constraints = [{ key: 'path', allowed_prefixes: ['/safe'] }];
+
+    expect(() => enforceConstraints(params, constraints)).toThrow(/Constraint violation/);
+  });
+
+  it('blocks windows paths that only share a string prefix', () => {
+    const params = { path: 'C:\\safe-old\\file.txt' };
+    const constraints = [{ key: 'path', allowed_prefixes: ['C:\\safe'] }];
+
+    expect(() => enforceConstraints(params, constraints)).toThrow(/Constraint violation/);
+  });
+
+  it('allows normalized descendant windows paths inside the allowed prefix', () => {
+    const params = { path: 'C:/safe/subdir/file.txt' };
+    const constraints = [{ key: 'path', allowed_prefixes: ['C:\\safe'] }];
+
+    expect(() => enforceConstraints(params, constraints)).not.toThrow();
+  });
+
   it('ignores malformed constraint objects', () => {
     const params = { path: '/etc/passwd' };
     const constraints = [{ key: 123 }, null, { allowed_prefixes: ['/tmp'] }];

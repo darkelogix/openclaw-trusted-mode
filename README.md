@@ -62,6 +62,7 @@ For governed release declaration, see [`RELEASE_v1.0.0.md`](./RELEASE_v1.0.0.md)
   - `list_files`
   - `search_files`
 - Blocks high-risk tools such as `exec`, file writes/edits, and deletes unless you deliberately widen the policy.
+- Normalizes constrained paths before enforcing allowed prefixes so traversal and lookalike prefixes do not slip through.
 - Sends tool call context to a Policy Decision Point (PDP) endpoint.
 - Denies execution when PDP returns a deny decision.
 - Optionally enforces returned constraints.
