@@ -62,6 +62,8 @@ type AttestationReport = {
 const PDP_URL = process.env.PDP_URL || 'http://localhost:8001/v1/authorize';
 const POLICY_VARIANT = process.env.POLICY_VARIANT || 'guard-pro.v2026.02';
 const TENANT_ID = process.env.TENANT_ID || 'trial-tenant';
+const GATEWAY_ID = process.env.GATEWAY_ID || process.env.OPENCLAW_GATEWAY_ID || 'gw-smoke-1';
+const ENVIRONMENT = process.env.ENVIRONMENT || process.env.OPENCLAW_ENVIRONMENT || 'prod';
 const OPENCLAW_VERSION = resolveOpenClawVersion();
 const RUNTIME_CERTIFICATION_STATUS = normalizeRuntimeCertificationStatus(
   process.env.CERTIFICATION_STATUS || 'CERTIFIED_ENFORCED'
@@ -91,6 +93,8 @@ async function testDenyHighImpact(): Promise<CheckResult> {
     decision_sku: 'openclaw.trusted_mode.authorize.v1',
     policy_variant: POLICY_VARIANT,
     tenant_id: TENANT_ID,
+    gateway_id: GATEWAY_ID,
+    environment: ENVIRONMENT,
     inputs: { action_request: { tool_name: 'exec', params: {} } },
   };
   try {
@@ -113,6 +117,8 @@ async function testAllowLowImpact(): Promise<CheckResult> {
     decision_sku: 'openclaw.trusted_mode.authorize.v1',
     policy_variant: POLICY_VARIANT,
     tenant_id: TENANT_ID,
+    gateway_id: GATEWAY_ID,
+    environment: ENVIRONMENT,
     inputs: { action_request: { tool_name: 'read_file', params: {} } },
   };
   try {
@@ -132,6 +138,8 @@ async function testSignatureFailure(): Promise<CheckResult> {
     decision_sku: 'openclaw.trusted_mode.authorize.v1',
     policy_variant: 'invalid-pack',
     tenant_id: TENANT_ID,
+    gateway_id: GATEWAY_ID,
+    environment: ENVIRONMENT,
     inputs: { action_request: { tool_name: 'exec', params: {} } },
   };
   try {
