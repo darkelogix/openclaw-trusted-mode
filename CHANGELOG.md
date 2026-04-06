@@ -12,6 +12,9 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 ## Unreleased
 - Add gateway/environment fields to the published Trusted Mode Check PDP requests so live Guard Pro runtime validation works against quota-aware runtime bundles.
 
+## v1.0.3
+- Include the signed attestation pack files in the public npm package so Trusted Mode Check can verify local attestation out of the box.
+
 ## v1.0.2
 - Publish the gateway/environment-aware Trusted Mode Check flow so governed runtime validation uses the same tenant, gateway, and environment context as the customer runtime.
 
