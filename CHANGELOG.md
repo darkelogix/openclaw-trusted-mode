@@ -10,6 +10,11 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 - `CI`: Continuous Integration
 
 ## Unreleased
+- Add gateway/environment fields to the published Trusted Mode Check PDP requests so live Guard Pro runtime validation works against quota-aware runtime bundles.
+
+## v1.0.2
+- Publish the gateway/environment-aware Trusted Mode Check flow so governed runtime validation uses the same tenant, gateway, and environment context as the customer runtime.
+
 - Add governed release artifacts (`SECURITY.md`, `RELEASE_v1.0.0.md`, compatibility matrix).
 - Add Trusted Mode Check attestation status contract (`ENFORCED_OK`, `LOCKDOWN_ONLY`, `UNSAFE`) with JSON output.
 - Add CI gates for release artifact and changelog version discipline.
