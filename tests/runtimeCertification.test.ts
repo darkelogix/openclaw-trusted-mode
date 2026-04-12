@@ -31,4 +31,26 @@ describe('runtime certification', () => {
     expect(certificationBlockReason('LOCKDOWN_ONLY', 'exec')).toContain('CERTIFIED_ENFORCED');
     expect(certificationBlockReason('UNSUPPORTED', 'exec')).toContain('supported runtime');
   });
+
+  it('uses action-specific wording for shell, delete, and write blocks', () => {
+    expect(certificationBlockReason('LOCKDOWN_ONLY', 'exec')).toContain('Shell execution is disabled');
+    expect(certificationBlockReason('LOCKDOWN_ONLY', 'delete_file')).toContain(
+      'File deletion is disabled'
+    );
+    expect(certificationBlockReason('LOCKDOWN_ONLY', 'write_file')).toContain(
+      'File write and edit actions are disabled'
+    );
+  });
+
+  it('uses supported-runtime wording for unsupported shell, delete, and write blocks', () => {
+    expect(certificationBlockReason('UNSUPPORTED', 'exec')).toContain(
+      'Shell execution is disabled until you move to a supported runtime'
+    );
+    expect(certificationBlockReason('UNSUPPORTED', 'delete_file')).toContain(
+      'File deletion is disabled until you move to a supported runtime'
+    );
+    expect(certificationBlockReason('UNSUPPORTED', 'write_file')).toContain(
+      'File write and edit actions are disabled until you move to a supported runtime'
+    );
+  });
 });

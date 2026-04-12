@@ -11,6 +11,48 @@ const HIGH_RISK_TOOLS = new Set([
   'edit_file',
 ]);
 
+type ToolActionKind = 'shell' | 'delete' | 'write' | 'generic';
+
+function classifyToolAction(toolName: string): ToolActionKind {
+  const normalized = toolName.trim().toLowerCase();
+  if (['exec', 'execute_shell', 'run_shell_command', 'shell'].includes(normalized)) {
+    return 'shell';
+  }
+  if (['delete_file', 'remove_file'].includes(normalized)) {
+    return 'delete';
+  }
+  if (['write_file', 'edit_file'].includes(normalized)) {
+    return 'write';
+  }
+  return 'generic';
+}
+
+function lockDownActionMessage(kind: ToolActionKind): string {
+  if (kind === 'shell') {
+    return 'Shell execution is disabled until this runtime is certified and moved to CERTIFIED_ENFORCED.';
+  }
+  if (kind === 'delete') {
+    return 'File deletion is disabled until this runtime is certified and moved to CERTIFIED_ENFORCED.';
+  }
+  if (kind === 'write') {
+    return 'File write and edit actions are disabled until this runtime is certified and moved to CERTIFIED_ENFORCED.';
+  }
+  return 'This high-risk action is disabled until this runtime is certified and moved to CERTIFIED_ENFORCED.';
+}
+
+function unsupportedActionMessage(kind: ToolActionKind): string {
+  if (kind === 'shell') {
+    return 'Shell execution is disabled until you move to a supported runtime.';
+  }
+  if (kind === 'delete') {
+    return 'File deletion is disabled until you move to a supported runtime.';
+  }
+  if (kind === 'write') {
+    return 'File write and edit actions are disabled until you move to a supported runtime.';
+  }
+  return 'This high-risk action is disabled until you move to a supported runtime.';
+}
+
 export function normalizeRuntimeCertificationStatus(
   value: unknown
 ): RuntimeCertificationStatus {
@@ -60,8 +102,13 @@ export function certificationBlockReason(
   status: RuntimeCertificationStatus,
   toolName: string
 ): string {
+  const kind = classifyToolAction(toolName);
   if (status === 'UNSUPPORTED') {
-    return `[Trusted Mode BLOCKED] High-risk tool "${toolName}" is disabled because this OpenClaw runtime is UNSUPPORTED. Readonly governed validation can continue, but shell, write, and delete actions stay blocked until you move to a supported runtime.`;
+    return `[Trusted Mode BLOCKED] Guard Pro blocked tool "${toolName}" because this OpenClaw runtime is UNSUPPORTED. Readonly governed validation can continue, but ${unsupportedActionMessage(
+      kind
+    )}`;
   }
-  return `[Trusted Mode BLOCKED] High-risk tool "${toolName}" is disabled because this OpenClaw runtime is LOCKDOWN_ONLY (not certified). Readonly governed validation is working, but shell, write, and delete actions stay blocked until this runtime is certified and moved to CERTIFIED_ENFORCED.`;
+  return `[Trusted Mode BLOCKED] Guard Pro blocked tool "${toolName}" because this OpenClaw runtime is LOCKDOWN_ONLY (not certified). Readonly governed validation is working, but ${lockDownActionMessage(
+    kind
+  )}`;
 }
