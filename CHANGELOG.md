@@ -12,6 +12,11 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 ## Unreleased
 - No unreleased changes recorded.
 
+## v1.0.5
+- Add `openclaw-trusted-mode-configure`, a dedicated guided config writer for governed OpenClaw hosts that updates `~/.openclaw/openclaw.json` with `plugins.allow`, tenant, gateway, environment, PDP URL, and fail-closed settings.
+- Remove the remaining manual-JSON ambiguity from the package docs by documenting the new configure command for governed mode.
+- Keep the package contract explicit by publishing the new configure CLI and its config-writer module in the npm tarball.
+
 ## v1.0.4
 - Make the public npm package install-safe for current OpenClaw builds by separating Trusted Mode Check environment reads from PDP network calls in the shipped CLI entrypoint.
 - Align `openclaw.plugin.json` with the published package version and keep the required helper CLI modules in the npm tarball.

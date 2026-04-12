@@ -128,6 +128,19 @@ openclaw plugins info openclaw-trusted-mode
 
 For a standalone free-mode config, start from [`openclaw.user-config.entry.example.json`](./openclaw.user-config.entry.example.json).
 
+For governed mode, install/register the plugin first, then write the OpenClaw host config with:
+
+```bash
+openclaw-trusted-mode-configure \
+  --tenantId darkelogix \
+  --gatewayId gw-dev \
+  --environment dev \
+  --pdpUrl http://10.90.0.6:8001/v1/authorize \
+  --certificationStatus LOCKDOWN_ONLY
+```
+
+This command updates `~/.openclaw/openclaw.json`, adds `openclaw-trusted-mode` to `plugins.allow`, and writes the governed plugin settings under `plugins.entries.openclaw-trusted-mode`.
+
 ## Plugin config
 
 See [`openclaw.plugin.json`](./openclaw.plugin.json) for config schema and defaults, including:
@@ -165,6 +178,8 @@ Recommended paid / PDP-backed baseline:
   "toolPolicyMode": "PDP",
   "pdpUrl": "http://localhost:8001/v1/authorize",
   "tenantId": "trial-tenant",
+  "gatewayId": "gw-smoke-1",
+  "environment": "prod",
   "failClosed": true,
   "certificationStatus": "LOCKDOWN_ONLY"
 }
@@ -197,5 +212,4 @@ npm run bundle-release-evidence
 ```bash
 npm run startup-health-check -- --skip-plugin-check
 ```
-
 

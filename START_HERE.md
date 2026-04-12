@@ -114,8 +114,8 @@ Use this path if you want practical local hardening without SDE PDP.
 Set-Location <openclaw-trusted-mode-path>
 npm install
 npm run build
-openclaw plugins install <openclaw-trusted-mode-path> --no-color
-openclaw plugins info openclaw-trusted-mode --no-color
+openclaw plugins install <openclaw-trusted-mode-path>
+openclaw plugins info openclaw-trusted-mode
 ```
 
 Expected: plugin status is `loaded`.
@@ -156,8 +156,9 @@ Expected:
 Set-Location <openclaw-trusted-mode-path>
 npm install
 npm run build
-openclaw plugins install <openclaw-trusted-mode-path> --no-color
-openclaw plugins info openclaw-trusted-mode --no-color
+openclaw plugins install <openclaw-trusted-mode-path>
+openclaw plugins info openclaw-trusted-mode
+openclaw-trusted-mode-configure --tenantId <tenant-id> --gatewayId <gateway-id> --environment <environment> --pdpUrl http://<guard-pro-host>:8001/v1/authorize --certificationStatus LOCKDOWN_ONLY
 ```
 
 Expected: plugin status is `loaded`.

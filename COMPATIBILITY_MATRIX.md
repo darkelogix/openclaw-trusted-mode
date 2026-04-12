@@ -13,7 +13,7 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 | 2026.2.15 | 1.0.0 | CERTIFIED_ENFORCED | Not run | Verified in current release cycle. |
 | 2026.2.16 | 1.0.0 | LOCKDOWN_ONLY | Not run | Config-writer version warning observed; certify before enforced claims. |
 | 2026.4.2 | 1.0.3 | CERTIFIED_ENFORCED | Runtime check passes against Guard Pro `sde-runtime-2-8-2` with local attestation files present | Gateway/environment-aware runtime validation and packaged attestation verification confirmed on the current Ubuntu GUI VM path. |
-| latest (rolling) | 1.0.4 | UNSUPPORTED | Not run | Publish the installer-safety fix, but treat rolling OpenClaw builds as uncertified until CI certification completes. |
+| latest (rolling) | 1.0.5 | UNSUPPORTED | Not run | Publish the governed-mode configure helper, but treat rolling OpenClaw builds as uncertified until CI certification completes. |
 
 ## Certification Rule
 

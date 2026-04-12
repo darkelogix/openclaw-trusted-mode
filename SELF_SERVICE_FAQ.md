@@ -54,8 +54,8 @@ If not:
 Set-Location <openclaw-trusted-mode-path>
 npm install
 npm run build
-openclaw plugins install <openclaw-trusted-mode-path> --no-color
-openclaw plugins info openclaw-trusted-mode --no-color
+openclaw plugins install <openclaw-trusted-mode-path>
+openclaw plugins info openclaw-trusted-mode
 ```
 
 Expected: plugin status is `loaded`.
@@ -104,7 +104,24 @@ Check in order:
 3. If using WSL, test `host.docker.internal` endpoint.
 4. Keep `failClosed=true` in production.
 
-## 6) License endpoint or support placeholders are unresolved
+## 6) `[Trusted Mode ERROR] Hardening config invalid`
+
+Meaning: OpenClaw loaded the plugin, but `~/.openclaw/openclaw.json` still has an incomplete plugin config.
+
+For governed mode, rewrite the host config with:
+
+```powershell
+openclaw-trusted-mode-configure --tenantId <tenant-id> --gatewayId <gateway-id> --environment <environment> --pdpUrl http://<guard-pro-host>:8001/v1/authorize --certificationStatus LOCKDOWN_ONLY
+```
+
+That command:
+
+1. Adds `openclaw-trusted-mode` to `plugins.allow`.
+2. Sets `toolPolicyMode=PDP`.
+3. Writes `tenantId`, `gatewayId`, `environment`, `pdpUrl`, `failClosed=true`, and `allowedTenantIds=[tenantId]`.
+4. Replaces stale standalone `ALLOWLIST_ONLY` defaults that can block governed startup.
+
+## 7) License endpoint or support placeholders are unresolved
 
 Define and verify the values from `START_HERE.md` section "Remaining org-specific values to fill once":
 
@@ -117,7 +134,7 @@ After setting values:
 1. Re-run licensing/activation check (`sde-cli license status`).
 2. Re-run pilot or production readiness checklist.
 
-## 7) `ENTITLEMENT_DENIED` for expected active tenant
+## 8) `ENTITLEMENT_DENIED` for expected active tenant
 
 1. Inspect `ops/entitlements.json` for exact tenant key and SKU.
 2. Confirm request `tenant_id` matches exactly.
@@ -129,7 +146,7 @@ Set-Location <sde-enterprise-path>
 python ops\pdp_admin_cli.py authorize-test --tenant-id <tenant_id> --tool-name read_file --gateway-id gw-1 --environment prod
 ```
 
-## 8) Policy pack signature verification errors
+## 9) Policy pack signature verification errors
 
 1. Confirm both files exist for active variant:
 - `<variant>.json`
