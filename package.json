@@ -37,6 +37,8 @@
   "files": [
     "dist/attestation.js",
     "dist/cli.js",
+    "dist/cliConfig.js",
+    "dist/cliPdpClient.js",
     "dist/constraints.js",
     "dist/contextCurator.js",
     "dist/hardening.js",

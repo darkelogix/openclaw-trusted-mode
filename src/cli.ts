@@ -1,19 +1,14 @@
 #!/usr/bin/env node
 
-import { exit } from 'node:process';
-import {
-  makeTraceId,
-  verifyLocalAttestationPack,
-} from './attestation';
-import {
-  normalizeRuntimeCertificationStatus,
-  RuntimeCertificationStatus,
-} from './runtimeCertification';
-import { isLocalPdpUrl, maybeAppendSdeRuntimeGuidance } from './sdeGuidance';
-import { resolveOpenClawVersion } from './packageVersion';
+import { exit } from "node:process";
+import { makeTraceId, verifyLocalAttestationPack } from "./attestation";
+import { readCliConfig } from "./cliConfig";
+import { postDecision } from "./cliPdpClient";
+import { isLocalPdpUrl } from "./sdeGuidance";
+import { RuntimeCertificationStatus } from "./runtimeCertification";
 
 type DecisionResponse = {
-  decision: 'allow' | 'deny';
+  decision: "allow" | "deny";
   deny_code?: string;
   deny_reason?: string;
   trace?: {
@@ -24,23 +19,23 @@ type DecisionResponse = {
   };
 };
 
-type AttestationStatus = 'ENFORCED_OK' | 'LOCKDOWN_ONLY' | 'UNSAFE';
+type AttestationStatus = "ENFORCED_OK" | "LOCKDOWN_ONLY" | "UNSAFE";
 
 type CheckResult = {
   id:
-    | 'attestation_pack_signature'
-    | 'deny_high_impact'
-    | 'allow_low_impact'
-    | 'signature_failure';
+    | "attestation_pack_signature"
+    | "deny_high_impact"
+    | "allow_low_impact"
+    | "signature_failure";
   ok: boolean;
   detail: string;
 };
 
 type AxisScores = {
-  interception_proof: 'PASS' | 'FAIL';
-  fail_safe_posture: 'PASS' | 'FAIL';
-  integrity: 'PASS' | 'FAIL';
-  certified_compatibility: 'PASS' | 'WARN' | 'FAIL';
+  interception_proof: "PASS" | "FAIL";
+  fail_safe_posture: "PASS" | "FAIL";
+  integrity: "PASS" | "FAIL";
+  certified_compatibility: "PASS" | "WARN" | "FAIL";
 };
 
 type AttestationReport = {
@@ -59,111 +54,88 @@ type AttestationReport = {
   generated_at: string;
 };
 
-const PDP_URL = process.env.PDP_URL || 'http://localhost:8001/v1/authorize';
-const POLICY_VARIANT = process.env.POLICY_VARIANT || 'guard-pro.v2026.02';
-const TENANT_ID = process.env.TENANT_ID || 'trial-tenant';
-const GATEWAY_ID = process.env.GATEWAY_ID || process.env.OPENCLAW_GATEWAY_ID || 'gw-smoke-1';
-const ENVIRONMENT = process.env.ENVIRONMENT || process.env.OPENCLAW_ENVIRONMENT || 'prod';
-const OPENCLAW_VERSION = resolveOpenClawVersion();
-const RUNTIME_CERTIFICATION_STATUS = normalizeRuntimeCertificationStatus(
-  process.env.CERTIFICATION_STATUS || 'CERTIFIED_ENFORCED'
-);
-const JSON_MODE = process.argv.includes('--json');
-const EXPECTED_STATUS = process.env.EXPECTED_STATUS;
+const CONFIG = readCliConfig();
 
 async function post(payload: unknown): Promise<DecisionResponse> {
-  try {
-    const res = await fetch(PDP_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      throw new Error(`PDP unreachable (${res.status})`);
-    }
-    return (await res.json()) as DecisionResponse;
-  } catch (err: any) {
-    const detail = err?.name === 'AbortError' ? 'PDP timeout' : err?.message || String(err);
-    throw new Error(maybeAppendSdeRuntimeGuidance(detail, PDP_URL));
-  }
+  return postDecision(CONFIG.pdpUrl, payload);
 }
 
 async function testDenyHighImpact(): Promise<CheckResult> {
   const payload = {
-    decision_sku: 'openclaw.trusted_mode.authorize.v1',
-    policy_variant: POLICY_VARIANT,
-    tenant_id: TENANT_ID,
-    gateway_id: GATEWAY_ID,
-    environment: ENVIRONMENT,
-    inputs: { action_request: { tool_name: 'exec', params: {} } },
+    decision_sku: "openclaw.trusted_mode.authorize.v1",
+    policy_variant: CONFIG.policyVariant,
+    tenant_id: CONFIG.tenantId,
+    gateway_id: CONFIG.gatewayId,
+    environment: CONFIG.environment,
+    inputs: { action_request: { tool_name: "exec", params: {} } },
   };
   try {
     const result = await post(payload);
-    if (result.decision !== 'deny') {
-      return { id: 'deny_high_impact', ok: false, detail: `Expected deny, got ${result.decision}` };
+    if (result.decision !== "deny") {
+      return { id: "deny_high_impact", ok: false, detail: `Expected deny, got ${result.decision}` };
     }
-    if (result.deny_code !== 'HIGH_BLAST') {
-      return { id: 'deny_high_impact', ok: false, detail: `Expected deny_code=HIGH_BLAST, got ${result.deny_code}` };
+    if (result.deny_code !== "HIGH_BLAST") {
+      return { id: "deny_high_impact", ok: false, detail: `Expected deny_code=HIGH_BLAST, got ${result.deny_code}` };
     }
-    if (!JSON_MODE) console.log('✅ HIGH-IMPACT TOOL BLOCKED (exec)');
-    return { id: 'deny_high_impact', ok: true, detail: 'HIGH_BLAST deny verified' };
+    if (!CONFIG.jsonMode) console.log("✅ HIGH-IMPACT TOOL BLOCKED (exec)");
+    return { id: "deny_high_impact", ok: true, detail: "HIGH_BLAST deny verified" };
   } catch (err: any) {
-    return { id: 'deny_high_impact', ok: false, detail: err?.message || String(err) };
+    return { id: "deny_high_impact", ok: false, detail: err?.message || String(err) };
   }
 }
 
 async function testAllowLowImpact(): Promise<CheckResult> {
   const payload = {
-    decision_sku: 'openclaw.trusted_mode.authorize.v1',
-    policy_variant: POLICY_VARIANT,
-    tenant_id: TENANT_ID,
-    gateway_id: GATEWAY_ID,
-    environment: ENVIRONMENT,
-    inputs: { action_request: { tool_name: 'read_file', params: {} } },
+    decision_sku: "openclaw.trusted_mode.authorize.v1",
+    policy_variant: CONFIG.policyVariant,
+    tenant_id: CONFIG.tenantId,
+    gateway_id: CONFIG.gatewayId,
+    environment: CONFIG.environment,
+    inputs: { action_request: { tool_name: "read_file", params: {} } },
   };
   try {
     const result = await post(payload);
-    if (result.decision !== 'allow') {
-      return { id: 'allow_low_impact', ok: false, detail: `Expected allow, got ${result.decision}` };
+    if (result.decision !== "allow") {
+      return { id: "allow_low_impact", ok: false, detail: `Expected allow, got ${result.decision}` };
     }
-    if (!JSON_MODE) console.log('✅ LOW-IMPACT TOOL ALLOWED (read_file)');
-    return { id: 'allow_low_impact', ok: true, detail: 'allow decision verified' };
+    if (!CONFIG.jsonMode) console.log("✅ LOW-IMPACT TOOL ALLOWED (read_file)");
+    return { id: "allow_low_impact", ok: true, detail: "allow decision verified" };
   } catch (err: any) {
-    return { id: 'allow_low_impact', ok: false, detail: err?.message || String(err) };
+    return { id: "allow_low_impact", ok: false, detail: err?.message || String(err) };
   }
 }
 
 async function testSignatureFailure(): Promise<CheckResult> {
   const payload = {
-    decision_sku: 'openclaw.trusted_mode.authorize.v1',
-    policy_variant: 'invalid-pack',
-    tenant_id: TENANT_ID,
-    gateway_id: GATEWAY_ID,
-    environment: ENVIRONMENT,
-    inputs: { action_request: { tool_name: 'exec', params: {} } },
+    decision_sku: "openclaw.trusted_mode.authorize.v1",
+    policy_variant: "invalid-pack",
+    tenant_id: CONFIG.tenantId,
+    gateway_id: CONFIG.gatewayId,
+    environment: CONFIG.environment,
+    inputs: { action_request: { tool_name: "exec", params: {} } },
   };
   try {
     const result = await post(payload);
-    if (result.decision !== 'deny') {
-      return { id: 'signature_failure', ok: false, detail: `Expected deny, got ${result.decision}` };
+    if (result.decision !== "deny") {
+      return { id: "signature_failure", ok: false, detail: `Expected deny, got ${result.decision}` };
     }
-    const denyCode = String(result.deny_code || '');
-    const effectiveVariant = String(result.trace?.policy_variant || result.decision_proof?.policy_variant || '');
+    const denyCode = String(result.deny_code || "");
+    const effectiveVariant = String(result.trace?.policy_variant || result.decision_proof?.policy_variant || "");
     const acceptable =
-      denyCode.includes('SIGNATURE') ||
-      denyCode === 'POLICY_VARIANT_IMMUTABLE' ||
-      (denyCode === 'HIGH_BLAST' && effectiveVariant && effectiveVariant !== 'invalid-pack');
+      denyCode.includes("SIGNATURE") ||
+      denyCode === "POLICY_VARIANT_IMMUTABLE" ||
+      (denyCode === "HIGH_BLAST" && effectiveVariant && effectiveVariant !== "invalid-pack");
     if (!acceptable) {
       return {
-        id: 'signature_failure',
+        id: "signature_failure",
         ok: false,
         detail: `Expected signature/immutability deny or mapped-pack fail-closed result, got ${result.deny_code}`,
       };
     }
-    if (!JSON_MODE) console.log('✅ FAIL-CLOSED ON BAD SIGNATURE');
-    return { id: 'signature_failure', ok: true, detail: 'signature failure path denied' };
+    if (!CONFIG.jsonMode) console.log("✅ FAIL-CLOSED ON BAD SIGNATURE");
+    return { id: "signature_failure", ok: true, detail: "signature failure path denied" };
   } catch (err: any) {
-    return { id: 'signature_failure', ok: false, detail: err?.message || String(err) };
+    return { id: "signature_failure", ok: false, detail: err?.message || String(err) };
   }
 }
 
@@ -172,13 +144,13 @@ function deriveStatus(
   runtimeCertificationStatus: RuntimeCertificationStatus
 ): AttestationStatus {
   const allOk = results.every((r) => r.ok);
-  if (allOk) return 'ENFORCED_OK';
-  const packIntegrityFailure = results.some((r) => r.id === 'attestation_pack_signature' && !r.ok);
-  if (packIntegrityFailure) return 'UNSAFE';
-  const anyConnectivityFailure = results.some((r) => r.detail.includes('PDP unreachable') || r.detail.includes('fetch failed'));
-  if (anyConnectivityFailure) return 'UNSAFE';
-  if (runtimeCertificationStatus !== 'CERTIFIED_ENFORCED') return 'LOCKDOWN_ONLY';
-  return 'LOCKDOWN_ONLY';
+  if (allOk) return "ENFORCED_OK";
+  const packIntegrityFailure = results.some((r) => r.id === "attestation_pack_signature" && !r.ok);
+  if (packIntegrityFailure) return "UNSAFE";
+  const anyConnectivityFailure = results.some((r) => r.detail.includes("PDP unreachable") || r.detail.includes("fetch failed"));
+  if (anyConnectivityFailure) return "UNSAFE";
+  if (runtimeCertificationStatus !== "CERTIFIED_ENFORCED") return "LOCKDOWN_ONLY";
+  return "LOCKDOWN_ONLY";
 }
 
 function remediationFor(
@@ -186,29 +158,29 @@ function remediationFor(
   runtimeCertificationStatus: RuntimeCertificationStatus,
   hasConnectivityFailure: boolean
 ): string[] {
-  if (status === 'ENFORCED_OK') return ['No remediation required.'];
-  if (runtimeCertificationStatus !== 'CERTIFIED_ENFORCED') {
+  if (status === "ENFORCED_OK") return ["No remediation required."];
+  if (runtimeCertificationStatus !== "CERTIFIED_ENFORCED") {
     return [
-      'Run in LOCKDOWN_ONLY posture and block high-risk tools by default.',
-      'Certify this OpenClaw runtime version in COMPATIBILITY_MATRIX.md.',
-      'Set CERTIFICATION_STATUS=CERTIFIED_ENFORCED only after certification evidence is complete.',
+      "Run in LOCKDOWN_ONLY posture and block high-risk tools by default.",
+      "Certify this OpenClaw runtime version in COMPATIBILITY_MATRIX.md.",
+      "Set CERTIFICATION_STATUS=CERTIFIED_ENFORCED only after certification evidence is complete.",
     ];
   }
-  if (status === 'LOCKDOWN_ONLY') {
+  if (status === "LOCKDOWN_ONLY") {
     return [
-      'Review failing checks and update policy/tool-name mappings.',
-      'Re-run trusted-mode-check after remediation.',
+      "Review failing checks and update policy/tool-name mappings.",
+      "Re-run trusted-mode-check after remediation.",
     ];
   }
   const steps = [
-    'Restore PDP reachability and verify /healthz.',
-    'Confirm plugin pdpUrl and tenant configuration.',
-    'Keep fail-closed enabled until ENFORCED_OK is restored.',
+    "Restore PDP reachability and verify /healthz.",
+    "Confirm plugin pdpUrl and tenant configuration.",
+    "Keep fail-closed enabled until ENFORCED_OK is restored.",
   ];
-  if (hasConnectivityFailure && isLocalPdpUrl(PDP_URL)) {
+  if (hasConnectivityFailure && isLocalPdpUrl(CONFIG.pdpUrl)) {
     steps.unshift(
-      'If you only need standalone hardening, switch the plugin to ALLOWLIST_ONLY.',
-      'If you want governed mode, obtain the licensed SDE runtime and deployment instructions from https://darkelogix.ai/, then point PDP_URL at that environment.'
+      "If you only need standalone hardening, switch the plugin to ALLOWLIST_ONLY.",
+      "If you want governed mode, obtain the licensed SDE runtime and deployment instructions from https://darkelogix.ai/, then point PDP_URL at that environment."
     );
   }
   return steps;
@@ -221,32 +193,32 @@ function computeAxisScores(
   const okById = new Map(checks.map((c) => [c.id, c.ok]));
   return {
     interception_proof:
-      okById.get('deny_high_impact') && okById.get('allow_low_impact') ? 'PASS' : 'FAIL',
-    fail_safe_posture: okById.get('signature_failure') ? 'PASS' : 'FAIL',
-    integrity: okById.get('attestation_pack_signature') ? 'PASS' : 'FAIL',
+      okById.get("deny_high_impact") && okById.get("allow_low_impact") ? "PASS" : "FAIL",
+    fail_safe_posture: okById.get("signature_failure") ? "PASS" : "FAIL",
+    integrity: okById.get("attestation_pack_signature") ? "PASS" : "FAIL",
     certified_compatibility:
-      runtimeCertificationStatus === 'CERTIFIED_ENFORCED'
-        ? 'PASS'
-        : runtimeCertificationStatus === 'LOCKDOWN_ONLY'
-          ? 'WARN'
-          : 'FAIL',
+      runtimeCertificationStatus === "CERTIFIED_ENFORCED"
+        ? "PASS"
+        : runtimeCertificationStatus === "LOCKDOWN_ONLY"
+          ? "WARN"
+          : "FAIL",
   };
 }
 
 async function main() {
-  if (!JSON_MODE) console.log('🔍 Running Trusted Mode Check...\n');
+  if (!CONFIG.jsonMode) console.log("🔍 Running Trusted Mode Check...\n");
   const traceId = makeTraceId();
   const packVerification = verifyLocalAttestationPack();
   const packCheck: CheckResult = packVerification.ok
     ? {
-        id: 'attestation_pack_signature',
+        id: "attestation_pack_signature",
         ok: true,
         detail: `verified (${packVerification.packVersion})`,
       }
     : {
-        id: 'attestation_pack_signature',
+        id: "attestation_pack_signature",
         ok: false,
-        detail: packVerification.error || 'attestation verification failed',
+        detail: packVerification.error || "attestation verification failed",
       };
 
   const checks = await Promise.all([
@@ -256,51 +228,51 @@ async function main() {
     testSignatureFailure(),
   ]);
 
-  const anyConnectivityFailure = checks.some((r) => r.detail.includes('PDP unreachable') || r.detail.includes('fetch failed') || r.detail.includes('timeout') || r.detail.includes('aborted'));
+  const anyConnectivityFailure = checks.some((r) => r.detail.includes("PDP unreachable") || r.detail.includes("fetch failed") || r.detail.includes("timeout") || r.detail.includes("aborted"));
   const status =
-    RUNTIME_CERTIFICATION_STATUS === 'CERTIFIED_ENFORCED'
-      ? deriveStatus(checks, RUNTIME_CERTIFICATION_STATUS)
-      : 'LOCKDOWN_ONLY';
-  const axisScores = computeAxisScores(checks, RUNTIME_CERTIFICATION_STATUS);
+    CONFIG.runtimeCertificationStatus === "CERTIFIED_ENFORCED"
+      ? deriveStatus(checks, CONFIG.runtimeCertificationStatus)
+      : "LOCKDOWN_ONLY";
+  const axisScores = computeAxisScores(checks, CONFIG.runtimeCertificationStatus);
   const report: AttestationReport = {
     status,
-    policy_variant: POLICY_VARIANT,
-    pdp_url: PDP_URL,
-    tenant_id: TENANT_ID,
+    policy_variant: CONFIG.policyVariant,
+    pdp_url: CONFIG.pdpUrl,
+    tenant_id: CONFIG.tenantId,
     trace_id: traceId,
-    openclaw_version: OPENCLAW_VERSION,
-    runtime_certification_status: RUNTIME_CERTIFICATION_STATUS,
+    openclaw_version: CONFIG.openclawVersion,
+    runtime_certification_status: CONFIG.runtimeCertificationStatus,
     attestation_pack_version: packVerification.packVersion,
     attestation_signature_verified: packVerification.signatureVerified,
     axis_scores: axisScores,
     checks,
-    remediation: remediationFor(status, RUNTIME_CERTIFICATION_STATUS, anyConnectivityFailure),
+    remediation: remediationFor(status, CONFIG.runtimeCertificationStatus, anyConnectivityFailure),
     generated_at: new Date().toISOString(),
   };
 
-  if (JSON_MODE) {
+  if (CONFIG.jsonMode) {
     console.log(JSON.stringify(report, null, 2));
   } else {
-    if (status === 'ENFORCED_OK') {
-      console.log('\n🎉 ALL TESTS PASSED — Trusted Mode is LIVE and PROVABLE');
-      console.log('   Your OpenClaw deployment is now governed.');
+    if (status === "ENFORCED_OK") {
+      console.log("\n🎉 ALL TESTS PASSED — Trusted Mode is LIVE and PROVABLE");
+      console.log("   Your OpenClaw deployment is now governed.");
     } else {
       console.error(`\n❌ TRUSTED MODE CHECK STATUS: ${status}`);
       for (const check of checks) {
         if (!check.ok) console.error(`- ${check.id}: ${check.detail}`);
       }
-      console.error('\nRemediation:');
+      console.error("\nRemediation:");
       for (const step of report.remediation) console.error(`- ${step}`);
     }
-    console.log('\nAttestation report (--json):');
+    console.log("\nAttestation report (--json):");
     console.log(JSON.stringify(report, null, 2));
   }
 
-  if (EXPECTED_STATUS) {
-    if (status !== EXPECTED_STATUS) exit(1);
+  if (CONFIG.expectedStatus) {
+    if (status !== CONFIG.expectedStatus) exit(1);
     return;
   }
-  if (status !== 'ENFORCED_OK') exit(1);
+  if (status !== "ENFORCED_OK") exit(1);
 }
 
 main();

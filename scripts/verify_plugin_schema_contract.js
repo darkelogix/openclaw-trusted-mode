@@ -17,11 +17,16 @@ function ensureProp(schemaProps, key) {
 function main() {
   const root = process.cwd();
   const pluginPath = path.join(root, 'openclaw.plugin.json');
+  const packagePath = path.join(root, 'package.json');
   const runtimePath = path.join(root, 'src', 'index.ts');
+  const cliPath = path.join(root, 'src', 'cli.ts');
   if (!fs.existsSync(pluginPath)) fail('Missing openclaw.plugin.json');
+  if (!fs.existsSync(packagePath)) fail('Missing package.json');
   if (!fs.existsSync(runtimePath)) fail('Missing src/index.ts');
+  if (!fs.existsSync(cliPath)) fail('Missing src/cli.ts');
 
   const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf8'));
+  const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
   const props = plugin?.configSchema?.properties;
   if (!props || typeof props !== 'object') {
     fail('openclaw.plugin.json missing configSchema.properties');
@@ -45,7 +50,21 @@ function main() {
   ];
   for (const key of requiredKeys) ensureProp(props, key);
 
+  if (!pkg.openclaw || !Array.isArray(pkg.openclaw.extensions) || !pkg.openclaw.extensions.includes('dist/index.js')) {
+    fail('package.json missing openclaw.extensions entry for dist/index.js');
+  }
+  const publishedFiles = Array.isArray(pkg.files) ? pkg.files : [];
+  for (const requiredFile of ['dist/cli.js', 'dist/cliConfig.js', 'dist/cliPdpClient.js']) {
+    if (!publishedFiles.includes(requiredFile)) {
+      fail(`package.json files missing required published artifact: ${requiredFile}`);
+    }
+  }
+  if (plugin.version !== pkg.version) {
+    fail(`Version drift: openclaw.plugin.json version ${plugin.version} does not match package.json version ${pkg.version}`);
+  }
+
   const runtime = fs.readFileSync(runtimePath, 'utf8');
+  const cli = fs.readFileSync(cliPath, 'utf8');
   const runtimeUses = [
     'config.pdpUrl',
     'config.policyVariant',
@@ -88,6 +107,13 @@ function main() {
   }
   if (props.certificationStatus.default !== 'LOCKDOWN_ONLY') {
     fail('Schema default drift: certificationStatus.default must be LOCKDOWN_ONLY');
+  }
+
+  if (cli.includes('process.env')) {
+    fail('Install-safety drift: src/cli.ts must not read process.env directly');
+  }
+  if (cli.includes('fetch(')) {
+    fail('Install-safety drift: src/cli.ts must not perform network calls directly');
   }
 
   console.log('Plugin schema/runtime contract check passed.');
