@@ -1,7 +1,7 @@
 {
   "id": "openclaw-trusted-mode",
   "name": "Trusted Mode Governance",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Provable enforcement using SDE-PDP + signed policy packs",
   "author": "Darkelogix",
   "hooks": ["before_tool_call"],

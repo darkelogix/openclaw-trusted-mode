@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  certificationBlockReason,
   normalizeRuntimeCertificationStatus,
   resolveRuntimeCertificationStatus,
   shouldBlockToolForCertification,
@@ -23,5 +24,11 @@ describe('runtime certification', () => {
     expect(shouldBlockToolForCertification('LOCKDOWN_ONLY', 'execute_shell')).toBe(true);
     expect(shouldBlockToolForCertification('UNSUPPORTED', 'execute_shell')).toBe(true);
     expect(shouldBlockToolForCertification('CERTIFIED_ENFORCED', 'execute_shell')).toBe(false);
+  });
+
+  it('returns a clearer certification block reason for UI-facing errors', () => {
+    expect(certificationBlockReason('LOCKDOWN_ONLY', 'exec')).toContain('Readonly governed validation is working');
+    expect(certificationBlockReason('LOCKDOWN_ONLY', 'exec')).toContain('CERTIFIED_ENFORCED');
+    expect(certificationBlockReason('UNSUPPORTED', 'exec')).toContain('supported runtime');
   });
 });

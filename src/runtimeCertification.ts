@@ -61,7 +61,7 @@ export function certificationBlockReason(
   toolName: string
 ): string {
   if (status === 'UNSUPPORTED') {
-    return `[Trusted Mode BLOCKED] Tool "${toolName}" blocked: runtime is UNSUPPORTED.`;
+    return `[Trusted Mode BLOCKED] High-risk tool "${toolName}" is disabled because this OpenClaw runtime is UNSUPPORTED. Readonly governed validation can continue, but shell, write, and delete actions stay blocked until you move to a supported runtime.`;
   }
-  return `[Trusted Mode BLOCKED] Tool "${toolName}" blocked: runtime is LOCKDOWN_ONLY (not certified).`;
+  return `[Trusted Mode BLOCKED] High-risk tool "${toolName}" is disabled because this OpenClaw runtime is LOCKDOWN_ONLY (not certified). Readonly governed validation is working, but shell, write, and delete actions stay blocked until this runtime is certified and moved to CERTIFIED_ENFORCED.`;
 }

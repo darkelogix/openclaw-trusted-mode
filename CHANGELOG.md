@@ -12,6 +12,10 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 ## Unreleased
 - No unreleased changes recorded.
 
+## v1.0.7
+- Replace the raw `LOCKDOWN_ONLY` / `UNSUPPORTED` certification block text with a clearer user-facing explanation that readonly governed validation is working and high-risk shell/write/delete actions remain intentionally disabled.
+- Keep the policy behavior unchanged while improving what the OpenClaw UI shows after a blocked high-risk request.
+
 ## v1.0.6
 - Add a runtime fallback that reads `plugins.entries.openclaw-trusted-mode.config` from `OPENCLAW_CONFIG_PATH` or `~/.openclaw/openclaw.json` when OpenClaw does not populate `api.config` on the hook-only plugin path.
 - Preserve governed-mode settings written by `openclaw-trusted-mode-configure` even on OpenClaw builds that load the plugin with incomplete in-memory config injection.
