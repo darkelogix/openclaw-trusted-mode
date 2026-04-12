@@ -13,10 +13,57 @@ const HIGH_RISK_TOOLS = new Set([
 
 type ToolActionKind = 'shell' | 'delete' | 'write' | 'generic';
 
-function classifyToolAction(toolName: string): ToolActionKind {
+function commandTextFromParams(params?: Record<string, unknown>): string {
+  if (!params || typeof params !== 'object') return '';
+  const candidates = [params.command, params.cmd, params.script];
+  for (const value of candidates) {
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+  return '';
+}
+
+function classifyCommandIntent(commandText: string): ToolActionKind {
+  const normalized = commandText.trim().toLowerCase();
+  if (!normalized) return 'shell';
+
+  const deletePatterns = [
+    /\bremove-item\b/,
+    /\bdel(?:\.exe)?\b/,
+    /\berase\b/,
+    /\brm\b/,
+    /\bunlink-item\b/,
+  ];
+  if (deletePatterns.some((pattern) => pattern.test(normalized))) {
+    return 'delete';
+  }
+
+  const writePatterns = [
+    /\bset-content\b/,
+    /\badd-content\b/,
+    /\bclear-content\b/,
+    /\bout-file\b/,
+    /\bset-itemproperty\b/,
+    /\bcopy-item\b/,
+    /\bmove-item\b/,
+    /\brename-item\b/,
+    /\becho\b.*[>]{1,2}/,
+  ];
+  if (writePatterns.some((pattern) => pattern.test(normalized))) {
+    return 'write';
+  }
+
+  return 'shell';
+}
+
+function classifyToolAction(
+  toolName: string,
+  params?: Record<string, unknown>
+): ToolActionKind {
   const normalized = toolName.trim().toLowerCase();
   if (['exec', 'execute_shell', 'run_shell_command', 'shell'].includes(normalized)) {
-    return 'shell';
+    return classifyCommandIntent(commandTextFromParams(params));
   }
   if (['delete_file', 'remove_file'].includes(normalized)) {
     return 'delete';
@@ -100,9 +147,10 @@ export function shouldBlockToolForCertification(
 
 export function certificationBlockReason(
   status: RuntimeCertificationStatus,
-  toolName: string
+  toolName: string,
+  params?: Record<string, unknown>
 ): string {
-  const kind = classifyToolAction(toolName);
+  const kind = classifyToolAction(toolName, params);
   if (status === 'UNSUPPORTED') {
     return `[Trusted Mode BLOCKED] Guard Pro blocked tool "${toolName}" because this OpenClaw runtime is UNSUPPORTED. Readonly governed validation can continue, but ${unsupportedActionMessage(
       kind

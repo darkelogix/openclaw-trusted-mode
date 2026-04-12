@@ -87,6 +87,64 @@ describe('trusted mode plugin', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+  it('surfaces delete-specific certification wording for exec delete commands', async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+
+    const { api, getHandler } = createApi({
+      toolPolicyMode: 'PDP',
+      failClosed: true,
+      certificationStatus: 'LOCKDOWN_ONLY',
+      tenantId: 'darkelogix',
+      gatewayId: 'gw-dev',
+      environment: 'dev',
+    });
+
+    register(api as never);
+    const result = await getHandler()({
+      toolName: 'exec',
+      params: {
+        command:
+          'Remove-Item -Path "C:\\Users\\darkelogixadmin\\.openclaw\\workspace\\guard-pro-ui-smoke.txt" -Force',
+      },
+    });
+
+    expect(result).toEqual({
+      block: true,
+      blockReason: expect.stringContaining('File deletion is disabled'),
+    });
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('surfaces write-specific certification wording for exec write commands', async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+
+    const { api, getHandler } = createApi({
+      toolPolicyMode: 'PDP',
+      failClosed: true,
+      certificationStatus: 'LOCKDOWN_ONLY',
+      tenantId: 'darkelogix',
+      gatewayId: 'gw-dev',
+      environment: 'dev',
+    });
+
+    register(api as never);
+    const result = await getHandler()({
+      toolName: 'exec',
+      params: {
+        command:
+          'Set-Content -Path "C:\\Users\\darkelogixadmin\\.openclaw\\workspace\\guard-pro-ui-smoke.txt" -Value "updated"',
+      },
+    });
+
+    expect(result).toEqual({
+      block: true,
+      blockReason: expect.stringContaining('File write and edit actions are disabled'),
+    });
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it('surfaces SDE guidance when governed mode points at a missing local PDP', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('fetch failed')));
 

@@ -53,4 +53,19 @@ describe('runtime certification', () => {
       'File write and edit actions are disabled until you move to a supported runtime'
     );
   });
+
+  it('infers delete and write intent from exec command payloads', () => {
+    expect(
+      certificationBlockReason('LOCKDOWN_ONLY', 'exec', {
+        command:
+          'Remove-Item -Path "C:\\Users\\darkelogixadmin\\.openclaw\\workspace\\guard-pro-ui-smoke.txt" -Force',
+      })
+    ).toContain('File deletion is disabled');
+    expect(
+      certificationBlockReason('LOCKDOWN_ONLY', 'exec', {
+        command:
+          'Set-Content -Path "C:\\Users\\darkelogixadmin\\.openclaw\\workspace\\guard-pro-ui-smoke.txt" -Value "x"',
+      })
+    ).toContain('File write and edit actions are disabled');
+  });
 });

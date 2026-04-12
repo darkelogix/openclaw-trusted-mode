@@ -81,7 +81,10 @@ export default function register(api: PluginApi) {
     }
 
     if (shouldBlockToolForCertification(certificationStatus, event.toolName, highRiskTools)) {
-      return { block: true, blockReason: certificationBlockReason(certificationStatus, event.toolName) };
+      return {
+        block: true,
+        blockReason: certificationBlockReason(certificationStatus, event.toolName, event.params || {}),
+      };
     }
 
     if (toolPolicyMode === 'ALLOWLIST_ONLY') {
