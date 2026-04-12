@@ -10,7 +10,12 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 - `CI`: Continuous Integration
 
 ## Unreleased
-- Add gateway/environment fields to the published Trusted Mode Check PDP requests so live Guard Pro runtime validation works against quota-aware runtime bundles.
+- No unreleased changes recorded.
+
+## v1.0.4
+- Make the public npm package install-safe for current OpenClaw builds by separating Trusted Mode Check environment reads from PDP network calls in the shipped CLI entrypoint.
+- Align `openclaw.plugin.json` with the published package version and keep the required helper CLI modules in the npm tarball.
+- Preserve current compatibility posture by publishing the installer fix without claiming certification for rolling OpenClaw builds.
 
 ## v1.0.3
 - Include the signed attestation pack files in the public npm package so Trusted Mode Check can verify local attestation out of the box.
