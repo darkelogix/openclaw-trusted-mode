@@ -6,6 +6,7 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 
 - `SDE`: Strategic Decision Engine
 - `PDP`: Policy Decision Point
+- `CLI`: Command Line Interface
 
 ## 1) Release Thesis
 
