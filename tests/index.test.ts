@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import http from 'node:http';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import register from '../src/index';
 
 type RegisteredHook = (event: { toolName: string; params?: Record<string, unknown> }) => Promise<unknown>;
@@ -44,6 +47,7 @@ function startMockPdpServer(
 describe('trusted mode plugin', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    delete process.env.OPENCLAW_CONFIG_PATH;
   });
 
   it('allows standalone allowlist mode without calling the PDP', async () => {
@@ -151,6 +155,52 @@ describe('trusted mode plugin', () => {
       expect(result).toBeUndefined();
     } finally {
       server.close();
+    }
+  });
+
+  it('falls back to the OpenClaw config file when api.config is empty', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'openclaw-runtime-'));
+    const configPath = join(dir, 'openclaw.json');
+    process.env.OPENCLAW_CONFIG_PATH = configPath;
+    writeFileSync(
+      configPath,
+      JSON.stringify({
+        plugins: {
+          entries: {
+            'openclaw-trusted-mode': {
+              enabled: true,
+              config: {
+                toolPolicyMode: 'PDP',
+                pdpUrl: 'http://127.0.0.1:9/v1/authorize',
+                tenantId: 'darkelogix',
+                gatewayId: 'gw-dev',
+                environment: 'dev',
+                failClosed: true,
+                certificationStatus: 'LOCKDOWN_ONLY',
+                requireTenantId: true,
+                allowedTenantIds: ['darkelogix'],
+              },
+            },
+          },
+        },
+      })
+    );
+
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('fetch failed')));
+
+    try {
+      const { api, getHandler } = createApi({});
+
+      register(api as never);
+      const result = await getHandler()({ toolName: 'read_file', params: { path: 'README.md' } });
+
+      expect(result).toEqual({
+        block: true,
+        blockReason: expect.stringContaining('licensed SDE runtime'),
+      });
+      expect((result as { blockReason: string }).blockReason).not.toContain('Hardening configuration invalid');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
     }
   });
 });

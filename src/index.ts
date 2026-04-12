@@ -12,10 +12,11 @@ import {
   normalizeToolPolicyMode,
   validateHardeningConfig,
 } from './hardening';
+import { mergeDefinedConfig, readRuntimePluginConfig } from './runtimePluginConfig';
 import { maybeAppendSdeRuntimeGuidance } from './sdeGuidance';
 
 export default function register(api: PluginApi) {
-  const config = api.config as {
+  const config = mergeDefinedConfig(readRuntimePluginConfig(), (api.config || {}) as Record<string, unknown>) as {
     pdpUrl?: string;
     policyVariant?: string;
     pdpTimeoutMs?: number;

@@ -1,6 +1,6 @@
 {
   "name": "@darkelogix/openclaw-trusted-mode",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "MIT-licensed OpenClaw Trusted Mode plugin with standalone hardening and optional SDE-backed governance",
   "license": "MIT",
   "main": "dist/index.js",
@@ -47,6 +47,7 @@
     "dist/index.js",
     "dist/openclawConfig.js",
     "dist/packageVersion.js",
+    "dist/runtimePluginConfig.js",
     "dist/runtimeCertification.js",
     "dist/sdeGuidance.js",
     "openclaw.plugin.json",

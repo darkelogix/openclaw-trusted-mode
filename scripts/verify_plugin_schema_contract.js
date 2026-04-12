@@ -22,12 +22,14 @@ function main() {
   const cliPath = path.join(root, 'src', 'cli.ts');
   const configureCliPath = path.join(root, 'src', 'configureCli.ts');
   const openclawConfigPath = path.join(root, 'src', 'openclawConfig.ts');
+  const runtimePluginConfigPath = path.join(root, 'src', 'runtimePluginConfig.ts');
   if (!fs.existsSync(pluginPath)) fail('Missing openclaw.plugin.json');
   if (!fs.existsSync(packagePath)) fail('Missing package.json');
   if (!fs.existsSync(runtimePath)) fail('Missing src/index.ts');
   if (!fs.existsSync(cliPath)) fail('Missing src/cli.ts');
   if (!fs.existsSync(configureCliPath)) fail('Missing src/configureCli.ts');
   if (!fs.existsSync(openclawConfigPath)) fail('Missing src/openclawConfig.ts');
+  if (!fs.existsSync(runtimePluginConfigPath)) fail('Missing src/runtimePluginConfig.ts');
 
   const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf8'));
   const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
@@ -58,7 +60,7 @@ function main() {
     fail('package.json missing openclaw.extensions entry for dist/index.js');
   }
   const publishedFiles = Array.isArray(pkg.files) ? pkg.files : [];
-  for (const requiredFile of ['dist/cli.js', 'dist/cliConfig.js', 'dist/cliPdpClient.js', 'dist/configureCli.js', 'dist/openclawConfig.js']) {
+  for (const requiredFile of ['dist/cli.js', 'dist/cliConfig.js', 'dist/cliPdpClient.js', 'dist/configureCli.js', 'dist/openclawConfig.js', 'dist/runtimePluginConfig.js']) {
     if (!publishedFiles.includes(requiredFile)) {
       fail(`package.json files missing required published artifact: ${requiredFile}`);
     }
@@ -74,6 +76,7 @@ function main() {
   const cli = fs.readFileSync(cliPath, 'utf8');
   const configureCli = fs.readFileSync(configureCliPath, 'utf8');
   const openclawConfig = fs.readFileSync(openclawConfigPath, 'utf8');
+  const runtimePluginConfig = fs.readFileSync(runtimePluginConfigPath, 'utf8');
   const runtimeUses = [
     'config.pdpUrl',
     'config.policyVariant',
@@ -94,6 +97,9 @@ function main() {
     if (!runtime.includes(use)) {
       fail(`Runtime config contract drift: missing usage reference "${use}" in src/index.ts`);
     }
+  }
+  if (!runtime.includes('readRuntimePluginConfig')) {
+    fail('Runtime config contract drift: src/index.ts must read fallback config from runtimePluginConfig');
   }
 
   if (props.toolPolicyMode.default !== 'ALLOWLIST_ONLY') {
@@ -132,6 +138,9 @@ function main() {
   }
   if (!openclawConfig.includes('toolPolicyMode: "PDP"')) {
     fail('Config writer drift: src/openclawConfig.ts must force governed mode toolPolicyMode=PDP');
+  }
+  if (!runtimePluginConfig.includes('OPENCLAW_CONFIG_PATH')) {
+    fail('Runtime fallback drift: src/runtimePluginConfig.ts must honor OPENCLAW_CONFIG_PATH');
   }
 
   console.log('Plugin schema/runtime contract check passed.');

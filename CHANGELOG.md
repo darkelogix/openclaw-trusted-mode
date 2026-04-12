@@ -12,6 +12,11 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 ## Unreleased
 - No unreleased changes recorded.
 
+## v1.0.6
+- Add a runtime fallback that reads `plugins.entries.openclaw-trusted-mode.config` from `OPENCLAW_CONFIG_PATH` or `~/.openclaw/openclaw.json` when OpenClaw does not populate `api.config` on the hook-only plugin path.
+- Preserve governed-mode settings written by `openclaw-trusted-mode-configure` even on OpenClaw builds that load the plugin with incomplete in-memory config injection.
+- Publish the runtime fallback module in the npm tarball and cover it with adapter tests.
+
 ## v1.0.5
 - Add `openclaw-trusted-mode-configure`, a dedicated guided config writer for governed OpenClaw hosts that updates `~/.openclaw/openclaw.json` with `plugins.allow`, tenant, gateway, environment, PDP URL, and fail-closed settings.
 - Remove the remaining manual-JSON ambiguity from the package docs by documenting the new configure command for governed mode.
