@@ -39,8 +39,8 @@ It does not include the proprietary `sde-enterprise` runtime.
 
 First-time setup (download/install/configure/test/run): [`START_HERE.md`](./START_HERE.md).
 Troubleshooting decision tree: [`SELF_SERVICE_FAQ.md`](./SELF_SERVICE_FAQ.md).
-Org defaults and support metadata: `<org-values-file>`.
-One-command setup: `powershell -ExecutionPolicy Bypass -File <bootstrap-self-service-script-path>`.
+Org defaults and support metadata are delivered through the customer console and the licensed runtime-secrets package.
+One-command setup is generated per customer in the console Downloads page alongside the licensed runtime bundle.
 For full install/reinstall/uninstall/startup/config/troubleshooting guidance across both plugin and SDE-PDP, see [`OPERATIONS_GUIDE.md`](./OPERATIONS_GUIDE.md).
 For a simpler operator runbook, see [`RUNBOOK_NON_TECHNICAL.md`](./RUNBOOK_NON_TECHNICAL.md).
 For go-live gating, use [`PRODUCTION_READINESS_CHECKLIST.md`](./PRODUCTION_READINESS_CHECKLIST.md).
@@ -212,4 +212,5 @@ npm run bundle-release-evidence
 ```bash
 npm run startup-health-check -- --skip-plugin-check
 ```
+
 
