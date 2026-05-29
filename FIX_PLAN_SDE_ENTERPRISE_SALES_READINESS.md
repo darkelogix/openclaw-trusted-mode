@@ -6,6 +6,14 @@
 
 This document exists in all four repositories for cross-team visibility.
 
+Terminology reference: [GLOSSARY.md](./GLOSSARY.md)
+
+## Acronym Expansions
+
+- SDE: Strategic Decision Engine
+- PDP: Policy Decision Point
+- CLI: Command Line Interface
+
 ---
 
 ## P0 Blockers (Gate for Paid GA / Broad Self-Serve Sales)
