@@ -86,9 +86,9 @@ The product boundary should be explicit at install time:
   - best for "read/search only" OpenClaw sessions
 - Paid / enterprise use:
   - PDP-backed authorization and deny decisions
-  - signed policy packs
+  - local integrity-checked policy packs
   - tenant entitlements and governed rollout
-  - release attestation and compatibility certification
+  - local integrity evidence and compatibility certification
 
 ## Build and test
 
@@ -122,9 +122,9 @@ The JSON output also includes the exact governed context it checked:
 
 Use those fields first when a governed check fails. If dexgate is reachable but denies the request, confirm the workspace is licensed and the tenant, gateway, and environment values match the dexgate runtime you installed.
 
-Attestation pack inputs:
+Local integrity check inputs:
 - `attestation/trusted_mode_attest_v1.json`
-- `attestation/trusted_mode_attest_v1.sig`
+- `attestation/trusted_mode_attest_v1.sig` (SHA-256 checksum file; retained filename for compatibility)
 
 Runtime/certification env vars:
 - `CERTIFICATION_STATUS` (`CERTIFIED_ENFORCED` | `LOCKDOWN_ONLY` | `UNSUPPORTED`)
@@ -228,4 +228,3 @@ npm run bundle-release-evidence
 ```bash
 npm run startup-health-check -- --skip-plugin-check
 ```
-

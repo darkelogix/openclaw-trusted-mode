@@ -141,7 +141,7 @@ Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -in 8001,8002,8
   - Sends tool action requests to PDP (`/v1/authorize`)
   - Blocks or allows tool calls based on PDP decision
 - `sde-pdp` (PDP):
-  - Verifies signed policy packs
+  - Verifies local policy-pack integrity checks
   - Applies policy rules per request
   - Enforces tenant entitlements (`ops/entitlements.json`)
   - Returns `allow`/`deny` + optional constraints + trace
@@ -594,7 +594,7 @@ With SDE/PDP:
   - Confirm plugin `pdpUrl` points to reachable host from OpenClaw runtime
 
 6. `POLICY_SIGNATURE_INVALID`
-- Cause: pack/signature mismatch or bad key.
+- Cause: policy pack checksum mismatch or tampering.
 - Fix: restore matching `.json` + `.sig`, verify signing key and pack version.
 
 7. `ENTITLEMENT_DENIED`
@@ -793,7 +793,7 @@ Use this when validating certification posture for release evidence.
 Expected result:
 - `status: ENFORCED_OK`
 - `runtime_certification_status: CERTIFIED_ENFORCED`
-- `attestation_signature_verified: true`
+- `local_integrity_verified: true`
 
 POSIX:
 
@@ -1047,6 +1047,5 @@ Recommended SLA targets:
 
 Track:
 - MTTD, MTTR, incident count, rollback frequency, failed change rate.
-
 
 

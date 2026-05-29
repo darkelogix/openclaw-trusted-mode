@@ -2,7 +2,7 @@
   "id": "openclaw-trusted-mode",
   "name": "Trusted Mode Governance",
   "version": "1.0.7",
-  "description": "Provable enforcement using SDE-PDP + signed policy packs",
+  "description": "Trusted Mode hardening with optional SDE-PDP governance and local integrity checks",
   "author": "Automated Decision Systems, LLC",
   "hooks": ["before_tool_call"],
   "configSchema": {

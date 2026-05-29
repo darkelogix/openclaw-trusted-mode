@@ -27,8 +27,8 @@ High-priority security classes for this project:
 1. Enforcement bypass
 - Any path where denied actions can execute while system claims enforced governance.
 
-2. Signature bypass
-- Any ability to load or apply unsigned/tampered policy packs as trusted.
+2. Integrity bypass
+- Any ability to load or apply unchecked or tampered policy packs as trusted.
 
 3. Fail-closed failure
 - Cases where PDP unreachable/invalid responses do not block under configured fail-closed posture.
@@ -45,4 +45,4 @@ High-priority security classes for this project:
 - Keep `failClosed=true` in production.
 - Restrict plugin allowlist (`plugins.allow`) to trusted IDs.
 - Keep PDP network exposure minimal (prefer internal/private access).
-- Protect policy pack/signature files and entitlement configs with strict permissions.
+- Protect policy pack checksum files and entitlement configs with strict permissions.

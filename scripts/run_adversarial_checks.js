@@ -27,14 +27,14 @@ function isAcceptableInvalidPackDeny(body) {
   );
 }
 
-function verifyAttestation(packPath, sigPath) {
+function verifyLocalIntegrity(packPath, checksumPath) {
   if (!fs.existsSync(packPath)) return { ok: false, detail: 'pack missing' };
-  if (!fs.existsSync(sigPath)) return { ok: false, detail: 'signature missing' };
+  if (!fs.existsSync(checksumPath)) return { ok: false, detail: 'checksum missing' };
   const pack = fs.readFileSync(packPath, 'utf8');
-  const sig = fs.readFileSync(sigPath, 'utf8').trim();
+  const checksum = fs.readFileSync(checksumPath, 'utf8').trim();
   const expected = `sha256:${sha256Hex(pack)}`;
-  if (sig !== expected) return { ok: false, detail: 'signature mismatch' };
-  return { ok: true, detail: 'signature valid' };
+  if (checksum !== expected) return { ok: false, detail: 'checksum mismatch' };
+  return { ok: true, detail: 'checksum valid' };
 }
 
 async function callPdp(pdpUrl, policyVariant, toolName) {
@@ -65,8 +65,8 @@ async function runProfile({
   sigPath,
 }) {
   const checks = [];
-  const pack = verifyAttestation(packPath, sigPath);
-  checks.push({ id: 'attestation_pack_signature', ok: pack.ok, detail: pack.detail });
+  const pack = verifyLocalIntegrity(packPath, sigPath);
+  checks.push({ id: 'local_integrity_check', ok: pack.ok, detail: pack.detail });
 
   const deny = await callPdp(pdpUrl, policyVariant, 'execute_shell');
   if (!deny.ok) {
@@ -92,20 +92,20 @@ async function runProfile({
     });
   }
 
-  const signature = await callPdp(pdpUrl, 'invalid-pack', 'execute_shell');
-  if (!signature.ok) {
-    checks.push({ id: 'signature_failure', ok: false, detail: signature.detail });
+  const tamper = await callPdp(pdpUrl, 'invalid-pack', 'execute_shell');
+  if (!tamper.ok) {
+    checks.push({ id: 'tamper_detection_path', ok: false, detail: tamper.detail });
   } else {
-    const body = signature.body || {};
+    const body = tamper.body || {};
     checks.push({
-      id: 'signature_failure',
+      id: 'tamper_detection_path',
       ok: isAcceptableInvalidPackDeny(body),
       detail: `decision=${body.decision || 'missing'} code=${body.deny_code || 'missing'}`,
     });
   }
 
   const allOk = checks.every((c) => c.ok);
-  const hasPackFailure = checks.some((c) => c.id === 'attestation_pack_signature' && !c.ok);
+  const hasPackFailure = checks.some((c) => c.id === 'local_integrity_check' && !c.ok);
   const hasConnectivityFailure = checks.some((c) => c.detail.includes('fetch failed') || c.detail.includes('PDP unreachable'));
   let status = 'LOCKDOWN_ONLY';
   if (certificationStatus !== 'CERTIFIED_ENFORCED') {
@@ -121,18 +121,18 @@ async function runProfile({
   return { status, checks };
 }
 
-function makeTamperedAttestation() {
+function makeTamperedIntegrityPack() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'trusted-mode-adversarial-'));
   const packPath = path.join(dir, 'trusted_mode_attest_v1.json');
   const sigPath = path.join(dir, 'trusted_mode_attest_v1.sig');
   const pack = JSON.stringify({
-    pack_id: 'trusted_mode_attest',
+    pack_id: 'trusted_mode_integrity',
     pack_version: 'v1.0.0',
     schema_version: '2026-03-01',
   });
   fs.writeFileSync(packPath, pack, 'utf8');
-  const badSig = `sha256:${sha256Hex('tampered')}`;
-  fs.writeFileSync(sigPath, badSig, 'utf8');
+  const badChecksum = `sha256:${sha256Hex('tampered')}`;
+  fs.writeFileSync(sigPath, badChecksum, 'utf8');
   return { packPath, sigPath };
 }
 
@@ -169,15 +169,15 @@ async function main() {
   });
   assertCase('unsafe_on_pdp_fetch_failure', pdpFailure.status === 'UNSAFE', JSON.stringify(pdpFailure));
 
-  const tampered = makeTamperedAttestation();
-  const attestationFailure = await runProfile({
+  const tampered = makeTamperedIntegrityPack();
+  const integrityFailure = await runProfile({
     pdpUrl: defaultPdpUrl,
     policyVariant: 'guard-pro.v2026.02',
     certificationStatus: 'CERTIFIED_ENFORCED',
     packPath: tampered.packPath,
     sigPath: tampered.sigPath,
   });
-  assertCase('unsafe_on_attestation_signature_tamper', attestationFailure.status === 'UNSAFE', JSON.stringify(attestationFailure));
+  assertCase('unsafe_on_local_integrity_tamper', integrityFailure.status === 'UNSAFE', JSON.stringify(integrityFailure));
 
   const malformed = await runProfile({
     pdpUrl: defaultPdpUrl,
