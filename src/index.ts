@@ -18,6 +18,7 @@ import { maybeAppendSdeRuntimeGuidance } from './sdeGuidance';
 export default function register(api: PluginApi) {
   const config = mergeDefinedConfig(readRuntimePluginConfig(), (api.config || {}) as Record<string, unknown>) as {
     pdpUrl?: string;
+    pdpAuthToken?: string;
     policyVariant?: string;
     pdpTimeoutMs?: number;
     failClosed?: boolean;
@@ -35,6 +36,9 @@ export default function register(api: PluginApi) {
     allowedTenantIds?: string[];
   };
   const pdpUrl = config.pdpUrl || 'http://localhost:8001/v1/authorize';
+  const pdpAuthToken = typeof config.pdpAuthToken === 'string'
+    ? config.pdpAuthToken
+    : process.env.PDP_AUTH_TOKEN || process.env.DEXGATE_PDP_AUTH_TOKEN || '';
   const policyVariant = config.policyVariant || 'guard-pro.v2026.02';
   const pdpTimeoutMs = typeof config.pdpTimeoutMs === 'number' ? config.pdpTimeoutMs : 5000;
   const failClosed = config.failClosed !== false;
@@ -120,7 +124,7 @@ export default function register(api: PluginApi) {
     try {
       const res = await fetch(pdpUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: buildPdpHeaders(pdpAuthToken),
         body: JSON.stringify(payload),
         signal: controller.signal
       });
@@ -159,4 +163,13 @@ export default function register(api: PluginApi) {
       clearTimeout(timeout);
     }
   });
+}
+
+export function buildPdpHeaders(pdpAuthToken?: string): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  const token = typeof pdpAuthToken === 'string' ? pdpAuthToken.trim() : '';
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
 }

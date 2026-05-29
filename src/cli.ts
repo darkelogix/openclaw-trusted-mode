@@ -59,7 +59,7 @@ type AttestationReport = {
 const CONFIG = readCliConfig();
 
 async function post(payload: unknown): Promise<DecisionResponse> {
-  return postDecision(CONFIG.pdpUrl, payload);
+  return postDecision(CONFIG.pdpUrl, payload, { pdpAuthToken: CONFIG.pdpAuthToken });
 }
 
 async function testDenyHighImpact(): Promise<CheckResult> {

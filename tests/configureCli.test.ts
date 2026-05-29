@@ -22,6 +22,8 @@ describe("configure CLI", () => {
       "LOCKDOWN_ONLY",
       "--pdpTimeoutMs",
       "8000",
+      "--pdpAuthToken",
+      "test-token",
       "--json",
     ]);
 
@@ -30,6 +32,7 @@ describe("configure CLI", () => {
       gatewayId: "gw-dev",
       environment: "dev",
       pdpUrl: "http://10.90.0.6:8001/v1/authorize",
+      pdpAuthToken: "test-token",
       policyVariant: "guard-pro.v2026.02",
       configPath,
       certificationStatus: "LOCKDOWN_ONLY",

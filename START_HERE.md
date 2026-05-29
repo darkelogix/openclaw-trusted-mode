@@ -158,7 +158,7 @@ npm install
 npm run build
 openclaw plugins install <openclaw-trusted-mode-path>
 openclaw plugins info openclaw-trusted-mode
-openclaw-trusted-mode-configure --tenantId <tenant-id> --gatewayId <gateway-id> --environment <environment> --pdpUrl http://<guard-pro-host>:8001/v1/authorize --certificationStatus LOCKDOWN_ONLY
+openclaw-trusted-mode-configure --tenantId <tenant-id> --gatewayId <gateway-id> --environment <environment> --pdpUrl http://<dexgate-host>:8001/v1/authorize --pdpAuthToken <runtime-token> --certificationStatus LOCKDOWN_ONLY
 ```
 
 Expected: plugin status is `loaded`.
@@ -201,5 +201,4 @@ For full production self-service, define these values once in your operations do
 5. Private registry/image coordinates (if used)
 
 These values are release-ops inputs, not blockers for local build/test validation.
-
 

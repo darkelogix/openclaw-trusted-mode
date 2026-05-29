@@ -3,6 +3,7 @@ import { normalizeRuntimeCertificationStatus, RuntimeCertificationStatus } from 
 
 export type CliConfig = {
   pdpUrl: string;
+  pdpAuthToken: string;
   policyVariant: string;
   tenantId: string;
   gatewayId: string;
@@ -18,6 +19,7 @@ export function readCliConfig(argv: string[] = process.argv): CliConfig {
 
   return {
     pdpUrl: env.PDP_URL || "http://localhost:8001/v1/authorize",
+    pdpAuthToken: env.PDP_AUTH_TOKEN || env.DEXGATE_PDP_AUTH_TOKEN || "",
     policyVariant: env.POLICY_VARIANT || "guard-pro.v2026.02",
     tenantId: env.TENANT_ID || "trial-tenant",
     gatewayId: env.GATEWAY_ID || env.OPENCLAW_GATEWAY_ID || "gw-smoke-1",

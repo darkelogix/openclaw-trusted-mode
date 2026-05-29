@@ -12,11 +12,24 @@ type DecisionResponse = {
   };
 };
 
-export async function postDecision(pdpUrl: string, payload: unknown): Promise<DecisionResponse> {
+export function buildPdpHeaders(pdpAuthToken?: string): Record<string, string> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const token = typeof pdpAuthToken === "string" ? pdpAuthToken.trim() : "";
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+export async function postDecision(
+  pdpUrl: string,
+  payload: unknown,
+  options: { pdpAuthToken?: string } = {}
+): Promise<DecisionResponse> {
   try {
     const res = await fetch(pdpUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: buildPdpHeaders(options.pdpAuthToken),
       body: JSON.stringify(payload),
     });
 

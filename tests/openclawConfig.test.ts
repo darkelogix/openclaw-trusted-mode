@@ -27,6 +27,7 @@ describe("openclaw governed config writer", () => {
 
     const { config, pluginAllowAdded } = configureGovernedPlugin(base, {
       pdpUrl: "http://10.90.0.6:8001/v1/authorize",
+      pdpAuthToken: "test-token",
       policyVariant: "guard-pro.v2026.02",
       tenantId: "darkelogix",
       gatewayId: "gw-dev",
@@ -46,6 +47,7 @@ describe("openclaw governed config writer", () => {
             enabled: true,
             config: {
               pdpUrl: "http://10.90.0.6:8001/v1/authorize",
+              pdpAuthToken: "test-token",
               policyVariant: "guard-pro.v2026.02",
               tenantId: "darkelogix",
               gatewayId: "gw-dev",

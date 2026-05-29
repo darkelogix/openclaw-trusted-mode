@@ -3,7 +3,7 @@ import http from 'node:http';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import register from '../src/index';
+import register, { buildPdpHeaders } from '../src/index';
 
 type RegisteredHook = (event: { toolName: string; params?: Record<string, unknown> }) => Promise<unknown>;
 
@@ -65,6 +65,14 @@ describe('trusted mode plugin', () => {
 
     expect(result).toBeUndefined();
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('builds PDP headers with bearer auth when configured', () => {
+    expect(buildPdpHeaders(' runtime-token ')).toEqual({
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer runtime-token',
+    });
+    expect(buildPdpHeaders()).toEqual({ 'Content-Type': 'application/json' });
   });
 
   it('blocks denied tools locally in allowlist mode', async () => {

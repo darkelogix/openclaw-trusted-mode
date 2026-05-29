@@ -15,6 +15,7 @@ type ConfigureCliOptions = {
   gatewayId: string;
   environment: string;
   pdpUrl: string;
+  pdpAuthToken?: string;
   policyVariant: string;
   configPath: string;
   certificationStatus: "CERTIFIED_ENFORCED" | "LOCKDOWN_ONLY" | "UNSUPPORTED";
@@ -38,6 +39,7 @@ Options:
                                    Default: LOCKDOWN_ONLY
   --pdpTimeoutMs <ms>              PDP timeout to store in plugin config.
                                    Default: 5000
+  --pdpAuthToken <token>           Optional PDP bearer token to store in plugin config.
   --failOpen                       Write failClosed=false instead of true.
   --json                           Print a JSON summary instead of prose.
   --help                           Show this help text.
@@ -73,6 +75,7 @@ export function parseConfigureCliArgs(argv: string[]): ConfigureCliOptions {
   const environment = readFlagValue(argv, "--environment");
   const pdpUrl = readFlagValue(argv, "--pdpUrl");
   const policyVariant = readFlagValue(argv, "--policyVariant") || "guard-pro.v2026.02";
+  const pdpAuthToken = readFlagValue(argv, "--pdpAuthToken");
   const configPath = expandHomePath(
     readFlagValue(argv, "--configPath") || join(homedir(), ".openclaw", "openclaw.json")
   );
@@ -102,6 +105,7 @@ export function parseConfigureCliArgs(argv: string[]): ConfigureCliOptions {
     gatewayId: gatewayId as string,
     environment: environment as string,
     pdpUrl: pdpUrl as string,
+    pdpAuthToken,
     policyVariant,
     configPath,
     certificationStatus,
@@ -126,6 +130,7 @@ export function runConfigureCli(argv: string[] = process.argv.slice(2)): void {
         gatewayId: options.gatewayId,
         environment: options.environment,
         pdpUrl: options.pdpUrl,
+        pdpAuthTokenConfigured: Boolean(options.pdpAuthToken),
         policyVariant: options.policyVariant,
         certificationStatus: options.certificationStatus,
         failClosed: options.failClosed,
@@ -144,6 +149,7 @@ export function runConfigureCli(argv: string[] = process.argv.slice(2)): void {
     console.log(`- gatewayId=${options.gatewayId}`);
     console.log(`- environment=${options.environment}`);
     console.log(`- pdpUrl=${options.pdpUrl}`);
+    console.log(`- pdpAuthTokenConfigured=${Boolean(options.pdpAuthToken)}`);
     console.log(`- toolPolicyMode=PDP`);
     console.log(`- failClosed=${options.failClosed}`);
     console.log(`- certificationStatus=${options.certificationStatus}`);
