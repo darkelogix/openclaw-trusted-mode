@@ -77,14 +77,14 @@ function checkAttestationIntegrity() {
   const sigPath =
     process.env.TRUSTED_MODE_ATTEST_SIG_PATH ||
     path.join(root, 'attestation', 'trusted_mode_attest_v1.sig');
-  if (!fs.existsSync(packPath)) fail(`missing attestation pack: ${packPath}`);
-  if (!fs.existsSync(sigPath)) fail(`missing attestation signature: ${sigPath}`);
+  if (!fs.existsSync(packPath)) fail(`missing local integrity pack: ${packPath}`);
+  if (!fs.existsSync(sigPath)) fail(`missing local integrity checksum: ${sigPath}`);
 
   const pack = fs.readFileSync(packPath, 'utf8');
   const sig = fs.readFileSync(sigPath, 'utf8').trim();
   const expected = `sha256:${sha256Hex(pack)}`;
-  if (sig !== expected) fail('attestation signature mismatch');
-  pass('attestation signature verification passed');
+  if (sig !== expected) fail('local integrity checksum mismatch');
+  pass('local integrity verification passed');
 }
 
 async function checkPdpHealth(pdpHealthUrl) {
@@ -143,7 +143,7 @@ async function checkTrustedModeStatus(pdpUrl, certificationStatus, expectedStatu
 
   const sig = await call('invalid-pack', 'execute_shell');
   checks.push({
-    id: 'signature_failure',
+    id: 'tamper_detection_path',
     ok: sig.ok && isAcceptableInvalidPackDeny(sig.body),
     detail: sig.ok ? `decision=${sig.body?.decision || 'missing'} code=${sig.body?.deny_code || 'missing'}` : sig.detail,
   });

@@ -5,9 +5,9 @@ import { join, resolve } from 'node:path';
 export type PackVerificationResult = {
   ok: boolean;
   packPath: string;
-  signaturePath: string;
+  checksumPath: string;
   packVersion: string;
-  signatureVerified: boolean;
+  integrityVerified: boolean;
   error?: string;
 };
 
@@ -29,75 +29,77 @@ export function resolveAttestationPaths() {
   const packPath =
     process.env.TRUSTED_MODE_ATTEST_PATH ||
     join(projectRoot, 'attestation', 'trusted_mode_attest_v1.json');
-  const signaturePath =
+  const checksumPath =
     process.env.TRUSTED_MODE_ATTEST_SIG_PATH ||
     join(projectRoot, 'attestation', 'trusted_mode_attest_v1.sig');
-  return { packPath, signaturePath };
+  return { packPath, checksumPath };
 }
 
-export function verifyAttestationPack(
+export function verifyIntegrityPack(
   packPath: string,
-  signaturePath: string
+  checksumPath: string
 ): PackVerificationResult {
   if (!existsSync(packPath)) {
     return {
       ok: false,
       packPath,
-      signaturePath,
+      checksumPath,
       packVersion: 'unknown',
-      signatureVerified: false,
-      error: 'Attestation pack file not found',
+      integrityVerified: false,
+      error: 'Local integrity pack file not found',
     };
   }
-  if (!existsSync(signaturePath)) {
+  if (!existsSync(checksumPath)) {
     return {
       ok: false,
       packPath,
-      signaturePath,
+      checksumPath,
       packVersion: 'unknown',
-      signatureVerified: false,
-      error: 'Attestation signature file not found',
+      integrityVerified: false,
+      error: 'Local integrity checksum file not found',
     };
   }
 
   try {
     const packRaw = readFileSync(packPath, 'utf8');
-    const sigRaw = readFileSync(signaturePath, 'utf8').trim();
+    const checksumRaw = readFileSync(checksumPath, 'utf8').trim();
     const parsed = JSON.parse(packRaw) as TrustedModeAttestPack;
     const packVersion = parsed.pack_version || 'unknown';
     const expected = `sha256:${sha256Hex(packRaw)}`;
 
-    if (sigRaw !== expected) {
+    if (checksumRaw !== expected) {
       return {
         ok: false,
         packPath,
-        signaturePath,
+        checksumPath,
         packVersion,
-        signatureVerified: false,
-        error: 'Attestation signature mismatch',
+        integrityVerified: false,
+        error: 'Local integrity checksum mismatch',
       };
     }
 
     return {
       ok: true,
       packPath,
-      signaturePath,
+      checksumPath,
       packVersion,
-      signatureVerified: true,
+      integrityVerified: true,
     };
   } catch (err: any) {
     return {
       ok: false,
       packPath,
-      signaturePath,
+      checksumPath,
       packVersion: 'unknown',
-      signatureVerified: false,
-      error: err?.message || 'Attestation verification failed',
+      integrityVerified: false,
+      error: err?.message || 'Local integrity verification failed',
     };
   }
 }
 
+export const verifyAttestationPack = verifyIntegrityPack;
+
 export function verifyLocalAttestationPack(): PackVerificationResult {
-  const { packPath, signaturePath } = resolveAttestationPaths();
-  return verifyAttestationPack(packPath, signaturePath);
+  const { packPath, checksumPath } = resolveAttestationPaths();
+  return verifyIntegrityPack(packPath, checksumPath);
 }

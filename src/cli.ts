@@ -23,10 +23,10 @@ type AttestationStatus = "ENFORCED_OK" | "LOCKDOWN_ONLY" | "UNSAFE";
 
 type CheckResult = {
   id:
-    | "attestation_pack_signature"
+    | "local_integrity_check"
     | "deny_high_impact"
     | "allow_low_impact"
-    | "signature_failure";
+    | "tamper_detection_path";
   ok: boolean;
   detail: string;
 };
@@ -48,8 +48,8 @@ type AttestationReport = {
   trace_id: string;
   openclaw_version: string;
   runtime_certification_status: RuntimeCertificationStatus;
-  attestation_pack_version: string;
-  attestation_signature_verified: boolean;
+  integrity_pack_version: string;
+  local_integrity_verified: boolean;
   axis_scores: AxisScores;
   checks: CheckResult[];
   remediation: string[];
@@ -107,7 +107,7 @@ async function testAllowLowImpact(): Promise<CheckResult> {
   }
 }
 
-async function testSignatureFailure(): Promise<CheckResult> {
+async function testTamperDetectionPath(): Promise<CheckResult> {
   const payload = {
     decision_sku: "openclaw.trusted_mode.authorize.v1",
     policy_variant: "invalid-pack",
@@ -119,7 +119,7 @@ async function testSignatureFailure(): Promise<CheckResult> {
   try {
     const result = await post(payload);
     if (result.decision !== "deny") {
-      return { id: "signature_failure", ok: false, detail: `Expected deny, got ${result.decision}` };
+      return { id: "tamper_detection_path", ok: false, detail: `Expected deny, got ${result.decision}` };
     }
     const denyCode = String(result.deny_code || "");
     const effectiveVariant = String(result.trace?.policy_variant || result.decision_proof?.policy_variant || "");
@@ -129,15 +129,15 @@ async function testSignatureFailure(): Promise<CheckResult> {
       (denyCode === "HIGH_BLAST" && effectiveVariant && effectiveVariant !== "invalid-pack");
     if (!acceptable) {
       return {
-        id: "signature_failure",
+        id: "tamper_detection_path",
         ok: false,
-        detail: `Expected signature/immutability deny or mapped-pack fail-closed result, got ${result.deny_code}`,
+        detail: `Expected integrity/immutability deny or mapped-pack fail-closed result, got ${result.deny_code}`,
       };
     }
-    if (!CONFIG.jsonMode) console.log("✅ FAIL-CLOSED ON BAD SIGNATURE");
-    return { id: "signature_failure", ok: true, detail: "signature failure path denied" };
+    if (!CONFIG.jsonMode) console.log("✅ FAIL-CLOSED ON TAMPERED OR UNKNOWN PACK");
+    return { id: "tamper_detection_path", ok: true, detail: "tamper detection path denied" };
   } catch (err: any) {
-    return { id: "signature_failure", ok: false, detail: err?.message || String(err) };
+    return { id: "tamper_detection_path", ok: false, detail: err?.message || String(err) };
   }
 }
 
@@ -147,7 +147,7 @@ function deriveStatus(
 ): AttestationStatus {
   const allOk = results.every((r) => r.ok);
   if (allOk) return "ENFORCED_OK";
-  const packIntegrityFailure = results.some((r) => r.id === "attestation_pack_signature" && !r.ok);
+  const packIntegrityFailure = results.some((r) => r.id === "local_integrity_check" && !r.ok);
   if (packIntegrityFailure) return "UNSAFE";
   const anyConnectivityFailure = results.some((r) => r.detail.includes("PDP unreachable") || r.detail.includes("fetch failed"));
   if (anyConnectivityFailure) return "UNSAFE";
@@ -196,8 +196,8 @@ function computeAxisScores(
   return {
     interception_proof:
       okById.get("deny_high_impact") && okById.get("allow_low_impact") ? "PASS" : "FAIL",
-    fail_safe_posture: okById.get("signature_failure") ? "PASS" : "FAIL",
-    integrity: okById.get("attestation_pack_signature") ? "PASS" : "FAIL",
+    fail_safe_posture: okById.get("tamper_detection_path") ? "PASS" : "FAIL",
+    integrity: okById.get("local_integrity_check") ? "PASS" : "FAIL",
     certified_compatibility:
       runtimeCertificationStatus === "CERTIFIED_ENFORCED"
         ? "PASS"
@@ -213,21 +213,21 @@ async function main() {
   const packVerification = verifyLocalAttestationPack();
   const packCheck: CheckResult = packVerification.ok
     ? {
-        id: "attestation_pack_signature",
+        id: "local_integrity_check",
         ok: true,
         detail: `verified (${packVerification.packVersion})`,
       }
     : {
-        id: "attestation_pack_signature",
+        id: "local_integrity_check",
         ok: false,
-        detail: packVerification.error || "attestation verification failed",
+        detail: packVerification.error || "local integrity verification failed",
       };
 
   const checks = await Promise.all([
     Promise.resolve(packCheck),
     testDenyHighImpact(),
     testAllowLowImpact(),
-    testSignatureFailure(),
+    testTamperDetectionPath(),
   ]);
 
   const anyConnectivityFailure = checks.some((r) => r.detail.includes("PDP unreachable") || r.detail.includes("fetch failed") || r.detail.includes("timeout") || r.detail.includes("aborted"));
@@ -246,8 +246,8 @@ async function main() {
     trace_id: traceId,
     openclaw_version: CONFIG.openclawVersion,
     runtime_certification_status: CONFIG.runtimeCertificationStatus,
-    attestation_pack_version: packVerification.packVersion,
-    attestation_signature_verified: packVerification.signatureVerified,
+    integrity_pack_version: packVerification.packVersion,
+    local_integrity_verified: packVerification.integrityVerified,
     axis_scores: axisScores,
     checks,
     remediation: remediationFor(status, CONFIG.runtimeCertificationStatus, anyConnectivityFailure),
@@ -268,7 +268,7 @@ async function main() {
       console.error("\nRemediation:");
       for (const step of report.remediation) console.error(`- ${step}`);
     }
-    console.log("\nAttestation report (--json):");
+    console.log("\nTrusted Mode check report (--json):");
     console.log(JSON.stringify(report, null, 2));
   }
 

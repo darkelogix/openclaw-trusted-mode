@@ -1,13 +1,13 @@
 {
-  "pack_id": "trusted_mode_attest",
+  "pack_id": "trusted_mode_integrity",
   "pack_version": "v1.0.0",
   "schema_version": "2026-03-01",
   "issued_at": "2026-03-01T00:00:00Z",
   "checks": [
-    "attestation_pack_signature",
+    "local_integrity_check",
     "deny_high_impact",
     "allow_low_impact",
-    "signature_failure"
+    "tamper_detection_path"
   ],
   "output_contract": {
     "status_values": ["ENFORCED_OK", "LOCKDOWN_ONLY", "UNSAFE"],

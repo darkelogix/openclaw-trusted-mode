@@ -33,7 +33,7 @@ Then choose one of these runtime paths:
   - no SDE PDP required
 - SDE-backed governed mode:
   - requires `<sde-enterprise-path>`
-  - adds PDP authorization, signed policy packs, and entitlements
+  - adds PDP authorization, local integrity checks, and entitlements
 
 Org-specific values are centralized in `<org-values-file>`.
 
@@ -201,4 +201,3 @@ For full production self-service, define these values once in your operations do
 5. Private registry/image coordinates (if used)
 
 These values are release-ops inputs, not blockers for local build/test validation.
-

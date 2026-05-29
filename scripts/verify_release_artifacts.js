@@ -76,7 +76,7 @@ function main() {
 
   if (exists(path.join(root, 'SECURITY.md'))) {
     const sec = readText(path.join(root, 'SECURITY.md')).toLowerCase();
-    const requiredPhrases = ['enforcement bypass', 'signature bypass', 'fail-closed'];
+    const requiredPhrases = ['enforcement bypass', 'integrity bypass', 'fail-closed'];
     for (const phrase of requiredPhrases) {
       if (!sec.includes(phrase)) {
         fail(`SECURITY.md missing expected scope phrase: "${phrase}"`, errors);
