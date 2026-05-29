@@ -1,6 +1,6 @@
-# @darkelogix/openclaw-trusted-mode
+# @dexgate/openclaw-trusted-mode
 
-[![npm version](https://img.shields.io/npm/v/%40darkelogix%2Fopenclaw-trusted-mode)](https://www.npmjs.com/package/@darkelogix/openclaw-trusted-mode)
+[![npm version](https://img.shields.io/npm/v/%40dexgate%2Fopenclaw-trusted-mode)](https://www.npmjs.com/package/@dexgate/openclaw-trusted-mode)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 [![CI](https://github.com/darkelogix/openclaw-trusted-mode/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/darkelogix/openclaw-trusted-mode/actions/workflows/ci.yml)
 
@@ -21,16 +21,16 @@ Documentation index (by audience and task): [`docs/README.md`](./docs/README.md)
 Install the public MIT adapter/plugin package with:
 
 ```bash
-npm install @darkelogix/openclaw-trusted-mode
+npm install @dexgate/openclaw-trusted-mode
 ```
 
 ## What `npm install` gives you
 
-`npm install @darkelogix/openclaw-trusted-mode` gives you the MIT adapter/plugin layer and standalone hardening flow only. It does not grant access to the proprietary SDE runtime, enterprise deployment packs, or governed tenant entitlements.
+`npm install @dexgate/openclaw-trusted-mode` gives you the MIT adapter/plugin layer and standalone hardening flow only. It does not grant access to the proprietary SDE runtime, enterprise deployment packs, or governed tenant entitlements.
 
 ## Need governed mode?
 
-If you want SDE-backed governed mode, obtain your licensed SDE runtime and deployment instructions from the Darkelogix customer console. Use the public npm package for adapter installation, then connect it to your licensed SDE environment for governed authorization, evidence, and rollout controls.
+If you want SDE-backed governed mode, obtain your licensed SDE runtime and deployment instructions from the dexgate customer console. Use the public npm package for adapter installation, then connect it to your licensed SDE environment for governed authorization, evidence, and rollout controls.
 
 The npm package contains the MIT plugin files and standalone hardening logic only.
 It does not include the proprietary `sde-enterprise` runtime.
@@ -39,7 +39,7 @@ It does not include the proprietary `sde-enterprise` runtime.
 
 `openclaw-trusted-mode` is licensed under the MIT License.
 
-`sde-enterprise`, including the SDE PDP runtime and related enterprise deployment assets, is proprietary software and is not covered by the plugin's MIT license. Use, copying, modification, distribution, or deployment of the SDE runtime requires a separate commercial license or written permission from Darkelogix.
+`sde-enterprise`, including the SDE PDP runtime and related enterprise deployment assets, is proprietary software and is not covered by the plugin's MIT license. Use, copying, modification, distribution, or deployment of the SDE runtime requires a separate commercial license or written permission from Automated Decision Systems, LLC.
 
 First-time setup (download/install/configure/test/run): [`START_HERE.md`](./START_HERE.md).
 Troubleshooting decision tree: [`SELF_SERVICE_FAQ.md`](./SELF_SERVICE_FAQ.md).
@@ -114,6 +114,14 @@ JSON output status values:
 - `LOCKDOWN_ONLY`
 - `UNSAFE`
 
+The JSON output also includes the exact governed context it checked:
+- `pdp_url`
+- `tenant_id`
+- `gateway_id`
+- `environment`
+
+Use those fields first when a governed check fails. If dexgate is reachable but denies the request, confirm the workspace is licensed and the tenant, gateway, and environment values match the dexgate runtime you installed.
+
 Attestation pack inputs:
 - `attestation/trusted_mode_attest_v1.json`
 - `attestation/trusted_mode_attest_v1.sig`
@@ -136,7 +144,7 @@ For governed mode, install/register the plugin first, then write the OpenClaw ho
 
 ```bash
 openclaw-trusted-mode-configure \
-  --tenantId darkelogix \
+  --tenantId dexgate \
   --gatewayId gw-dev \
   --environment dev \
   --pdpUrl http://10.90.0.6:8001/v1/authorize \

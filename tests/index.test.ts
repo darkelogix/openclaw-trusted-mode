@@ -153,6 +153,8 @@ describe('trusted mode plugin', () => {
       failClosed: true,
       certificationStatus: 'CERTIFIED_ENFORCED',
       tenantId: 'trial-tenant',
+      gatewayId: 'gw-test',
+      environment: 'test',
     });
 
     register(api as never);
@@ -178,6 +180,8 @@ describe('trusted mode plugin', () => {
         failClosed: true,
         certificationStatus: 'CERTIFIED_ENFORCED',
         tenantId: 'trial-tenant',
+        gatewayId: 'gw-test',
+        environment: 'test',
       });
 
       register(api as never);
@@ -205,6 +209,8 @@ describe('trusted mode plugin', () => {
         pdpTimeoutMs: 25,
         certificationStatus: 'CERTIFIED_ENFORCED',
         tenantId: 'trial-tenant',
+        gatewayId: 'gw-test',
+        environment: 'test',
       });
 
       register(api as never);

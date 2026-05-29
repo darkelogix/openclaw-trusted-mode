@@ -42,7 +42,7 @@ Org-specific values are centralized in `<org-values-file>`.
 If you are coming from the public npm package, you can install it first with:
 
 ```powershell
-npm install @darkelogix/openclaw-trusted-mode
+npm install @dexgate/openclaw-trusted-mode
 ```
 
 Use the bootstrap path when you want the guided local setup flow.

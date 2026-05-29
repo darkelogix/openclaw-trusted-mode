@@ -10,6 +10,7 @@ describe('SDE runtime guidance', () => {
 
   it('does not add guidance for non-connectivity errors', () => {
     const result = maybeAppendSdeRuntimeGuidance('PDP unreachable (403)', 'http://localhost:8001/v1/authorize');
-    expect(result).toBe('PDP unreachable (403)');
+    expect(result).toMatch(/dexgate is reachable but denied this governed request/);
+    expect(result).toMatch(/tenantId, gatewayId, and environment/);
   });
 });
