@@ -130,6 +130,7 @@ Runtime/certification env vars:
 - `CERTIFICATION_STATUS` (`CERTIFIED_ENFORCED` | `LOCKDOWN_ONLY` | `UNSUPPORTED`)
 - `OPENCLAW_VERSION`
 - `EXPECTED_STATUS` (optional CI assertion override)
+- `PDP_AUTH_TOKEN` or `DEXGATE_PDP_AUTH_TOKEN` (optional bearer token for licensed PDP authentication)
 
 ## Local install in OpenClaw (WSL)
 
@@ -148,6 +149,7 @@ openclaw-trusted-mode-configure \
   --gatewayId gw-dev \
   --environment dev \
   --pdpUrl http://10.90.0.6:8001/v1/authorize \
+  --pdpAuthToken <runtime-token> \
   --certificationStatus LOCKDOWN_ONLY
 ```
 
@@ -158,6 +160,7 @@ This command updates `~/.openclaw/openclaw.json`, adds `openclaw-trusted-mode` t
 See [`openclaw.plugin.json`](./openclaw.plugin.json) for config schema and defaults, including:
 
 - `pdpUrl`
+- `pdpAuthToken`
 - `policyVariant`
 - `pdpTimeoutMs`
 - `failClosed`
@@ -189,6 +192,7 @@ Recommended paid / PDP-backed baseline:
 {
   "toolPolicyMode": "PDP",
   "pdpUrl": "http://localhost:8001/v1/authorize",
+  "pdpAuthToken": "<runtime-token>",
   "tenantId": "trial-tenant",
   "gatewayId": "gw-smoke-1",
   "environment": "prod",
@@ -224,5 +228,4 @@ npm run bundle-release-evidence
 ```bash
 npm run startup-health-check -- --skip-plugin-check
 ```
-
 

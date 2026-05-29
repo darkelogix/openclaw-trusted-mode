@@ -7,6 +7,7 @@ export const DEFAULT_OPENCLAW_CONFIG_PATH = "~/.openclaw/openclaw.json";
 export type GovernedConfigInput = {
   configPath: string;
   pdpUrl: string;
+  pdpAuthToken?: string;
   policyVariant: string;
   tenantId: string;
   gatewayId: string;
@@ -59,6 +60,7 @@ export function configureGovernedPlugin(
   const nextPluginConfig: JsonObject = {
     ...existingPluginConfig,
     pdpUrl: input.pdpUrl,
+    ...(input.pdpAuthToken ? { pdpAuthToken: input.pdpAuthToken } : {}),
     policyVariant: input.policyVariant,
     pdpTimeoutMs: input.pdpTimeoutMs,
     failClosed: input.failClosed,
