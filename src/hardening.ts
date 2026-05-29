@@ -5,7 +5,10 @@ export type HardeningConfig = {
   allowedTools?: string[];
   requireTenantId?: boolean;
   allowedTenantIds?: string[];
+  pdpUrl?: string;
   tenantId?: string;
+  gatewayId?: string;
+  environment?: string;
 };
 
 export type HardeningValidation = {
@@ -23,7 +26,10 @@ export function normalizeToolPolicyMode(value: unknown): ToolPolicyMode {
 export function validateHardeningConfig(config: HardeningConfig): HardeningValidation {
   const issues: string[] = [];
   const requireTenantId = config.requireTenantId === true;
+  const pdpUrl = String(config.pdpUrl || '').trim();
   const tenantId = String(config.tenantId || '').trim();
+  const gatewayId = String(config.gatewayId || '').trim();
+  const environment = String(config.environment || '').trim();
 
   if (requireTenantId && tenantId.length === 0) {
     issues.push('requireTenantId is true but tenantId is missing');
@@ -38,6 +44,20 @@ export function validateHardeningConfig(config: HardeningConfig): HardeningValid
   }
 
   const mode = normalizeToolPolicyMode(config.toolPolicyMode);
+  if (mode === 'PDP') {
+    if (pdpUrl.length === 0) {
+      issues.push('toolPolicyMode=PDP requires pdpUrl so dexgate can be reached');
+    }
+    if (tenantId.length === 0) {
+      issues.push('toolPolicyMode=PDP requires tenantId so dexgate can match this workspace');
+    }
+    if (gatewayId.length === 0) {
+      issues.push('toolPolicyMode=PDP requires gatewayId so dexgate can match this environment host');
+    }
+    if (environment.length === 0) {
+      issues.push('toolPolicyMode=PDP requires environment so dexgate can apply the correct profile');
+    }
+  }
   if (mode === 'ALLOWLIST_ONLY') {
     if (!Array.isArray(config.allowedTools) || config.allowedTools.length === 0) {
       issues.push('toolPolicyMode=ALLOWLIST_ONLY requires non-empty allowedTools');

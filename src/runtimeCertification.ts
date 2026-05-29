@@ -152,11 +152,11 @@ export function certificationBlockReason(
 ): string {
   const kind = classifyToolAction(toolName, params);
   if (status === 'UNSUPPORTED') {
-    return `[Trusted Mode BLOCKED] Guard Pro blocked tool "${toolName}" because this OpenClaw runtime is UNSUPPORTED. Readonly governed validation can continue, but ${unsupportedActionMessage(
+    return `[Trusted Mode BLOCKED] dexgate blocked tool "${toolName}" because this OpenClaw runtime is UNSUPPORTED. Readonly governed validation can continue, but ${unsupportedActionMessage(
       kind
     )}`;
   }
-  return `[Trusted Mode BLOCKED] Guard Pro blocked tool "${toolName}" because this OpenClaw runtime is LOCKDOWN_ONLY (not certified). Readonly governed validation is working, but ${lockDownActionMessage(
+  return `[Trusted Mode BLOCKED] dexgate blocked tool "${toolName}" because this OpenClaw runtime is LOCKDOWN_ONLY (not certified). Readonly governed validation is working, but ${lockDownActionMessage(
     kind
   )}`;
 }

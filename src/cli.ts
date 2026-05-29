@@ -43,6 +43,8 @@ type AttestationReport = {
   policy_variant: string;
   pdp_url: string;
   tenant_id: string;
+  gateway_id: string;
+  environment: string;
   trace_id: string;
   openclaw_version: string;
   runtime_certification_status: RuntimeCertificationStatus;
@@ -180,7 +182,7 @@ function remediationFor(
   if (hasConnectivityFailure && isLocalPdpUrl(CONFIG.pdpUrl)) {
     steps.unshift(
       "If you only need standalone hardening, switch the plugin to ALLOWLIST_ONLY.",
-      "If you want governed mode, obtain the licensed SDE runtime and deployment instructions from https://darkelogix.ai/, then point PDP_URL at that environment."
+      "If you want governed mode, obtain the licensed SDE runtime and deployment instructions from https://dexgate.ai/, then point PDP_URL at that environment."
     );
   }
   return steps;
@@ -239,6 +241,8 @@ async function main() {
     policy_variant: CONFIG.policyVariant,
     pdp_url: CONFIG.pdpUrl,
     tenant_id: CONFIG.tenantId,
+    gateway_id: CONFIG.gatewayId,
+    environment: CONFIG.environment,
     trace_id: traceId,
     openclaw_version: CONFIG.openclawVersion,
     runtime_certification_status: CONFIG.runtimeCertificationStatus,

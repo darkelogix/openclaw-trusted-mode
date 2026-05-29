@@ -3,7 +3,7 @@
   "name": "Trusted Mode Governance",
   "version": "1.0.7",
   "description": "Provable enforcement using SDE-PDP + signed policy packs",
-  "author": "Darkelogix",
+  "author": "Automated Decision Systems, LLC",
   "hooks": ["before_tool_call"],
   "configSchema": {
     "type": "object",

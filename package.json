@@ -1,7 +1,7 @@
 {
-  "name": "@darkelogix/openclaw-trusted-mode",
+  "name": "@dexgate/openclaw-trusted-mode",
   "version": "1.0.7",
-  "description": "MIT-licensed OpenClaw Trusted Mode plugin with standalone hardening and optional SDE-backed governance",
+  "description": "MIT-licensed OpenClaw Trusted Mode plugin with standalone hardening and optional dexgate-backed governance",
   "license": "MIT",
   "main": "dist/index.js",
   "exports": {
@@ -11,13 +11,13 @@
     "openclaw-trusted-mode-check": "./dist/cli.js",
     "openclaw-trusted-mode-configure": "./dist/configureCli.js"
   },
-  "homepage": "https://www.darkelogix.ai/openclaw/",
+  "homepage": "https://dexgate.ai/openclaw/",
   "repository": {
     "type": "git",
     "url": "https://github.com/darkelogix/openclaw-trusted-mode.git"
   },
   "bugs": {
-    "url": "https://www.darkelogix.ai/contact/"
+    "url": "https://dexgate.ai/contact/"
   },
   "keywords": [
     "openclaw",
@@ -25,7 +25,7 @@
     "policy-enforcement",
     "governance",
     "security",
-    "darkelogix"
+    "dexgate"
   ],
   "publishConfig": {
     "access": "public"

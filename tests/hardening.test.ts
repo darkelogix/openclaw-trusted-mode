@@ -18,6 +18,15 @@ describe('hardening config', () => {
     expect(v.issues.join(' ')).toMatch(/requires non-empty allowedTools/);
   });
 
+  it('requires governed dexgate fields when PDP mode is enabled', () => {
+    const v = validateHardeningConfig({ toolPolicyMode: 'PDP' });
+    expect(v.ok).toBe(false);
+    expect(v.issues.join(' ')).toMatch(/requires pdpUrl/);
+    expect(v.issues.join(' ')).toMatch(/requires tenantId/);
+    expect(v.issues.join(' ')).toMatch(/requires gatewayId/);
+    expect(v.issues.join(' ')).toMatch(/requires environment/);
+  });
+
   it('enforces tenant allowlist when configured', () => {
     const v = validateHardeningConfig({
       tenantId: 'trial-tenant',

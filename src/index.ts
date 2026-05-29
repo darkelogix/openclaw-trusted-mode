@@ -55,7 +55,10 @@ export default function register(api: PluginApi) {
     allowedTools,
     requireTenantId: config.requireTenantId,
     allowedTenantIds: config.allowedTenantIds,
+    pdpUrl,
     tenantId,
+    gatewayId,
+    environment,
   });
 
   if (!hardeningValidation.ok) {

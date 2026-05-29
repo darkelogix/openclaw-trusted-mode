@@ -8,7 +8,7 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 
 ## Package
 
-- npm package name: `@darkelogix/openclaw-trusted-mode`
+- npm package name: `@dexgate/openclaw-trusted-mode`
 - license: `MIT`
 - proprietary SDE runtime: not included
 
