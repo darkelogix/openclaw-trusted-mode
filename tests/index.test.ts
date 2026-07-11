@@ -310,6 +310,46 @@ describe('trusted mode plugin', () => {
     }
   });
 
+  it('allows explicit monitor-mode bypass without Passport', async () => {
+    const { server, url } = await startMockPdpServer((_req, res) => {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({
+        decision: 'allow',
+        reasonCode: 'MONITOR_MODE_ALLOW',
+        enforcement_mode: 'monitor',
+        enforcement_bypassed: true,
+        would_have_decision: 'deny',
+        would_have_deny_code: 'CHANGE_CONTROL_REQUIRED',
+        monitor_mode: { scope_id: 'trusted-dev-workstation', status: 'active' },
+        passport: {
+          status: 'not_issued',
+          reason: 'monitor_mode_bypass_no_passport',
+        },
+        trace: { traceId: 'trace-monitor' },
+      }));
+    });
+
+    try {
+      const { api, getHandler } = createApi({
+        toolPolicyMode: 'PDP',
+        pdpUrl: url,
+        failClosed: true,
+        certificationStatus: 'CERTIFIED_ENFORCED',
+        pdpAuthToken: 'test-token',
+        tenantId: 'trial-tenant',
+        gatewayId: 'gw-test',
+        environment: 'test',
+      });
+
+      register(api as never);
+      const result = await getHandler()({ toolName: 'deploy_service', params: { service: 'api' } });
+
+      expect(result).toBeUndefined();
+    } finally {
+      server.close();
+    }
+  });
+
   it('fails open on PDP timeout when configured', async () => {
     const { server, url } = await startMockPdpServer(() => {
       // Intentionally never respond so AbortController drives the timeout path.

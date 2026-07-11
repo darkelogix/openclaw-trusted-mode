@@ -5,6 +5,13 @@ type DecisionResponse = {
   decision: "allow" | "constrain" | "deny";
   deny_code?: string;
   deny_reason?: string;
+  reasonCode?: string;
+  enforcement_mode?: "enforce" | "monitor";
+  enforcement_bypassed?: boolean;
+  would_have_decision?: string;
+  would_have_deny_code?: string;
+  would_have_deny_reason?: string;
+  monitor_mode?: Record<string, unknown>;
   passport?: unknown;
   constraints?: unknown;
   trace?: {

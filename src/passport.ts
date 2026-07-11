@@ -13,12 +13,17 @@ function isAuthorizingDecision(decision: unknown): boolean {
   return decision === 'allow' || decision === 'constrain';
 }
 
+function isMonitorModeBypass(body: any): boolean {
+  return body?.enforcement_mode === 'monitor' && body?.enforcement_bypassed === true;
+}
+
 export function hasPdpAuthToken(pdpAuthToken?: string): boolean {
   return typeof pdpAuthToken === 'string' && pdpAuthToken.trim().length > 0;
 }
 
 export function validatePdpPassport(body: any): PassportValidation {
   if (!isAuthorizingDecision(body?.decision)) return { ok: true };
+  if (isMonitorModeBypass(body)) return { ok: true };
 
   const passport = body?.passport;
   if (!passport || typeof passport !== 'object') {

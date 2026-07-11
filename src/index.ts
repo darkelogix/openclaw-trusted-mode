@@ -207,8 +207,12 @@ export default function register(api: PluginApi) {
           decision: decision.decision,
           reasonCode: decision.reasonCode || decision.deny_code || 'PDP_CONSTRAIN',
           source: 'pdp',
-          governed: decision.simulated === true ? false : true,
+          governed: decision.simulated === true || decision.enforcement_bypassed === true ? false : true,
           simulated: decision.simulated === true,
+          enforcementMode: decision.enforcement_mode || 'enforce',
+          enforcementBypassed: decision.enforcement_bypassed === true,
+          wouldHaveDecision: decision.would_have_decision || null,
+          wouldHaveDenyCode: decision.would_have_deny_code || null,
         });
         return { params: event.params || {} };
       }
@@ -216,8 +220,12 @@ export default function register(api: PluginApi) {
         decision: decision.decision,
         reasonCode: decision.reasonCode || decision.deny_code || 'PDP_ALLOW',
         source: 'pdp',
-        governed: decision.simulated === true ? false : true,
+        governed: decision.simulated === true || decision.enforcement_bypassed === true ? false : true,
         simulated: decision.simulated === true,
+        enforcementMode: decision.enforcement_mode || 'enforce',
+        enforcementBypassed: decision.enforcement_bypassed === true,
+        wouldHaveDecision: decision.would_have_decision || null,
+        wouldHaveDenyCode: decision.would_have_deny_code || null,
       });
     } catch (err: any) {
       const baseMsg = err?.name === 'AbortError' ? `PDP timeout after ${pdpTimeoutMs}ms` : err?.message || 'PDP authorization failed';

@@ -31,4 +31,26 @@ describe("CLI PDP client", () => {
       postDecision("http://127.0.0.1:9/v1/authorize", {}, { pdpAuthToken: "test-token" })
     ).rejects.toThrow(/passport/);
   });
+
+  it("accepts explicit monitor-mode allow responses without a Passport", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        decision: "allow",
+        reasonCode: "MONITOR_MODE_ALLOW",
+        enforcement_mode: "monitor",
+        enforcement_bypassed: true,
+        would_have_decision: "deny",
+        would_have_deny_code: "CHANGE_CONTROL_REQUIRED",
+        passport: { status: "not_issued", reason: "monitor_mode_bypass_no_passport" },
+      }),
+    }));
+
+    const result = await postDecision("http://127.0.0.1:9/v1/authorize", {}, { pdpAuthToken: "test-token" });
+
+    expect(result.decision).toBe("allow");
+    expect(result.enforcement_mode).toBe("monitor");
+    expect(result.enforcement_bypassed).toBe(true);
+    expect(result.would_have_deny_code).toBe("CHANGE_CONTROL_REQUIRED");
+  });
 });
