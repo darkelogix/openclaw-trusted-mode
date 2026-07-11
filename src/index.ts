@@ -1,4 +1,5 @@
 import type { BeforeToolCallResult, PluginApi, ToolCallEvent } from '@openclaw/core';
+import { hostname, platform, release } from 'node:os';
 import { enforceConstraints } from './constraints';
 import { curateContext, ContextCuratorConfig } from './contextCurator';
 import {
@@ -16,6 +17,41 @@ import { mergeDefinedConfig, readRuntimePluginConfig } from './runtimePluginConf
 import { maybeAppendSdeRuntimeGuidance } from './sdeGuidance';
 import { buildTelemetryConfig, sendTelemetryEvent } from './telemetry';
 import { validatePdpPassport } from './passport';
+
+function compactOrigin(origin: Record<string, unknown>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(origin)) {
+    if (typeof value === 'string' && value.trim()) {
+      out[key] = value.trim();
+    }
+  }
+  return out;
+}
+
+function buildOriginMetadata(event: ToolCallEvent, gatewayId?: string, environment?: string): Record<string, string> {
+  const params = (event.params || {}) as Record<string, unknown>;
+  const eventRecord = event as unknown as Record<string, unknown>;
+  const workspace = String(params.cwd || params.workingDirectory || params.workspace || '');
+  return compactOrigin({
+    user: process.env.USERNAME || process.env.USER || '',
+    machine_id: process.env.COMPUTERNAME || hostname(),
+    hostname: hostname(),
+    os: `${platform()} ${release()}`,
+    repo_url: String(params.repoUrl || params.remoteUrl || ''),
+    repo_path: String(params.repoPath || workspace || params.path || ''),
+    branch: String(params.branch || ''),
+    commit_sha: String(params.commitSha || params.sha || ''),
+    workspace,
+    agent: 'openclaw',
+    agent_version: process.env.OPENCLAW_VERSION || '',
+    adapter: 'openclaw-trusted-mode',
+    adapter_version: process.env.OPENCLAW_TRUSTED_MODE_VERSION || '1.0.7',
+    gateway_id: gatewayId || '',
+    environment: environment || '',
+    session_id: String(eventRecord.sessionId || eventRecord.threadId || eventRecord.conversationId || ''),
+    idempotency_key: String(eventRecord.idempotencyKey || ''),
+  });
+}
 
 export default function register(api: PluginApi) {
   const config = mergeDefinedConfig(readRuntimePluginConfig(), (api.config || {}) as Record<string, unknown>) as {
@@ -156,7 +192,8 @@ export default function register(api: PluginApi) {
         action_request: {
           tool_name: event.toolName,
           params: event.params || {},
-          context_summary: contextSummary
+          context_summary: contextSummary,
+          origin: buildOriginMetadata(event, gatewayId, environment)
         }
       }
     };

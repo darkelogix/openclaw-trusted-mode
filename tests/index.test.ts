@@ -280,6 +280,60 @@ describe('trusted mode plugin', () => {
     }
   });
 
+  it('sends origin metadata to the PDP for request tracking', async () => {
+    let captured: any = null;
+    const { server, url } = await startMockPdpServer((req, res) => {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', () => {
+        captured = JSON.parse(body);
+        res.writeHead(200, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({
+          decision: 'allow',
+          passport: validPassport(),
+          trace: { traceId: 'trace-origin' },
+        }));
+      });
+    });
+
+    try {
+      const { api, getHandler } = createApi({
+        toolPolicyMode: 'PDP',
+        pdpUrl: url,
+        failClosed: true,
+        certificationStatus: 'CERTIFIED_ENFORCED',
+        pdpAuthToken: 'test-token',
+        tenantId: 'trial-tenant',
+        gatewayId: 'gw-test',
+        environment: 'test',
+      });
+
+      register(api as never);
+      const result = await getHandler()({
+        toolName: 'read_file',
+        params: {
+          path: 'README.md',
+          cwd: 'C:\\dev\\repo',
+          repoUrl: 'https://github.com/example/repo',
+          branch: 'main',
+          commitSha: 'abc123',
+        },
+      });
+
+      expect(result).toBeUndefined();
+      expect(captured.inputs.action_request.origin.adapter).toBe('openclaw-trusted-mode');
+      expect(captured.inputs.action_request.origin.gateway_id).toBe('gw-test');
+      expect(captured.inputs.action_request.origin.environment).toBe('test');
+      expect(captured.inputs.action_request.origin.repo_url).toBe('https://github.com/example/repo');
+      expect(captured.inputs.action_request.origin.branch).toBe('main');
+      expect(captured.inputs.action_request.origin.commit_sha).toBe('abc123');
+    } finally {
+      server.close();
+    }
+  });
+
   it('fails closed when PDP allow omits Passport', async () => {
     const { server, url } = await startMockPdpServer((_req, res) => {
       res.writeHead(200, { 'content-type': 'application/json' });
