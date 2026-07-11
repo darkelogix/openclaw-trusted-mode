@@ -8,6 +8,7 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 
 - `SDE`: Strategic Decision Engine
 - `PDP`: Policy Decision Point
+- `PEP`: Policy Enforcement Point
 - `WSL`: Windows Subsystem for Linux
 - `CI`: Continuous Integration
 

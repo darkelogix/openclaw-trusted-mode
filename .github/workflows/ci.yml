@@ -24,5 +24,5 @@ jobs:
       - run: |
           node scripts/mock_pdp.js &
           sleep 1
-          PDP_URL=http://localhost:8001/v1/authorize npm run trusted-mode-check
+          PDP_URL=http://localhost:8001/v1/authorize PDP_AUTH_TOKEN=mock-ci-token npm run trusted-mode-check
           PDP_URL=http://localhost:8001/v1/authorize npm run adversarial-check

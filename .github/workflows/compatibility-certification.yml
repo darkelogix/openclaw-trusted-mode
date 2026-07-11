@@ -35,7 +35,8 @@ jobs:
           EXPECTED_STATUS=${{ matrix.expected_status }} \
           OPENCLAW_VERSION=${{ matrix.openclaw_version }} \
           PDP_URL=http://localhost:8001/v1/authorize \
-          npm run trusted-mode-check -- --json > compat-results/${{ matrix.openclaw_version }}.json
+          PDP_AUTH_TOKEN=mock-ci-token \
+          node dist/cli.js --json > compat-results/${{ matrix.openclaw_version }}.json
           cp compat-results/${{ matrix.openclaw_version }}.json release-evidence/matrix/runs/github-ubuntu-${{ matrix.openclaw_version }}.json
       - uses: actions/upload-artifact@v6
         with:

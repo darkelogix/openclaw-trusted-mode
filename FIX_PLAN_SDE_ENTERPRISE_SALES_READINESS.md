@@ -1,5 +1,11 @@
 # Sales Readiness Pointer
 
+Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
+
+## Acronym Expansions
+
+- `PDP`: Policy Decision Point
+
 Canonical sales-readiness planning is maintained in:
 
 `C:\dev\dexgate-platform-meta\SALES_READINESS_INDEX.md`

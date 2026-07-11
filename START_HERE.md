@@ -7,6 +7,11 @@ Use this guide to choose the right path:
 
 Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 
+## Acronym Expansions
+
+- `SDE`: Strategic Decision Engine
+- `PDP`: Policy Decision Point
+
 ## 1. Install The Public Adapter
 
 Create a clean directory on the OpenClaw host:

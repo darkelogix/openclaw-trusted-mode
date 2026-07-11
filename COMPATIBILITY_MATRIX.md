@@ -5,6 +5,7 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 ## Acronym Expansions
 - `CLI`: Command Line Interface
 - `CI`: Continuous Integration
+- `PDP`: Policy Decision Point
 
 ## Current Matrix
 

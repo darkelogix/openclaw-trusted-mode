@@ -9,7 +9,9 @@ function sendJson(res, status, body) {
 
 function decide(payload) {
   const variant = payload?.policy_variant || '';
-  const tool = payload?.inputs?.action_request?.tool_name || '';
+  const request = payload?.inputs?.action_request || {};
+  const tool = request?.tool_name || '';
+  const params = request?.params || {};
 
   if (variant.includes('malformed')) {
     return { malformed: true };
@@ -34,9 +36,9 @@ function decide(payload) {
       schema_id: 'passport.schema.coding.prod_change.v1',
       decision_sku: 'openclaw.trusted_mode.authorize.v1',
       tenant_id: 'mock-tenant',
-      authority: { authorized_action: request.tool_name || 'read_file' },
+      authority: { authorized_action: tool || 'read_file' },
       scope: {
-        target: request.params?.path || 'read_file',
+        target: params?.path || 'read_file',
         environment: 'dev',
       },
       expires_at: '2999-01-01T00:00:00Z',
