@@ -1,4 +1,4 @@
-# OpenClaw Trusted Mode Docs Index
+# DexGate OpenClaw Adapter Docs Index
 
 This index organizes release-facing documentation for operators, implementers, and auditors.
 
@@ -27,9 +27,9 @@ This index organizes release-facing documentation for operators, implementers, a
 
 ## Product and Compatibility
 
-- OpenClaw compatibility certification: [`../COMPATIBILITY_MATRIX.md`](../COMPATIBILITY_MATRIX.md)
+- OpenClaw compatibility validation: [`../COMPATIBILITY_MATRIX.md`](../COMPATIBILITY_MATRIX.md)
 - Performance baseline: [`../PERFORMANCE_BASELINE.md`](../PERFORMANCE_BASELINE.md)
-- Technical certification test pack: [`../SDE_PDP_OpenClaw_Technical_Certification_Test_Pack_v1.md`](../SDE_PDP_OpenClaw_Technical_Certification_Test_Pack_v1.md)
+- Technical validation test pack: [`../SDE_PDP_OpenClaw_Technical_Certification_Test_Pack_v1.md`](../SDE_PDP_OpenClaw_Technical_Certification_Test_Pack_v1.md)
 - Enterprise validation test pack: [`../SDE_PDP_OpenClaw_Enterprise_Validation_Test_Pack_v1.md`](../SDE_PDP_OpenClaw_Enterprise_Validation_Test_Pack_v1.md)
 
 ## Reference

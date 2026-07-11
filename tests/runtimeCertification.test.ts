@@ -24,11 +24,15 @@ describe('runtime certification', () => {
     expect(shouldBlockToolForCertification('LOCKDOWN_ONLY', 'execute_shell')).toBe(true);
     expect(shouldBlockToolForCertification('UNSUPPORTED', 'execute_shell')).toBe(true);
     expect(shouldBlockToolForCertification('CERTIFIED_ENFORCED', 'execute_shell')).toBe(false);
+    expect(shouldBlockToolForCertification('LOCKDOWN_ONLY', 'apply_patch')).toBe(true);
+    expect(shouldBlockToolForCertification('LOCKDOWN_ONLY', 'git_push')).toBe(true);
+    expect(shouldBlockToolForCertification('LOCKDOWN_ONLY', 'deploy_class')).toBe(true);
   });
 
-  it('returns a clearer certification block reason for UI-facing errors', () => {
+  it('returns a clearer compatibility block reason for UI-facing errors', () => {
     expect(certificationBlockReason('LOCKDOWN_ONLY', 'exec')).toContain('Readonly governed validation is working');
     expect(certificationBlockReason('LOCKDOWN_ONLY', 'exec')).toContain('CERTIFIED_ENFORCED');
+    expect(certificationBlockReason('LOCKDOWN_ONLY', 'exec')).toContain('validated compatibility row');
     expect(certificationBlockReason('UNSUPPORTED', 'exec')).toContain('supported runtime');
   });
 
@@ -39,6 +43,12 @@ describe('runtime certification', () => {
     );
     expect(certificationBlockReason('LOCKDOWN_ONLY', 'write_file')).toContain(
       'File write and edit actions are disabled'
+    );
+    expect(certificationBlockReason('LOCKDOWN_ONLY', 'git_push')).toContain(
+      'Git-changing actions are disabled'
+    );
+    expect(certificationBlockReason('LOCKDOWN_ONLY', 'deploy_class')).toContain(
+      'Deploy-class actions are disabled'
     );
   });
 

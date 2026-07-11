@@ -6,6 +6,10 @@ export type HardeningConfig = {
   requireTenantId?: boolean;
   allowedTenantIds?: string[];
   pdpUrl?: string;
+  pdpAuthToken?: string;
+  decisionSku?: string;
+  beachheadProfile?: string;
+  passportSchemaId?: string;
   tenantId?: string;
   gatewayId?: string;
   environment?: string;
@@ -27,6 +31,7 @@ export function validateHardeningConfig(config: HardeningConfig): HardeningValid
   const issues: string[] = [];
   const requireTenantId = config.requireTenantId === true;
   const pdpUrl = String(config.pdpUrl || '').trim();
+  const pdpAuthToken = String(config.pdpAuthToken || '').trim();
   const tenantId = String(config.tenantId || '').trim();
   const gatewayId = String(config.gatewayId || '').trim();
   const environment = String(config.environment || '').trim();
@@ -47,6 +52,9 @@ export function validateHardeningConfig(config: HardeningConfig): HardeningValid
   if (mode === 'PDP') {
     if (pdpUrl.length === 0) {
       issues.push('toolPolicyMode=PDP requires pdpUrl so dexgate can be reached');
+    }
+    if (pdpAuthToken.length === 0) {
+      issues.push('toolPolicyMode=PDP requires pdpAuthToken so paid dexgate PDP calls are authenticated');
     }
     if (tenantId.length === 0) {
       issues.push('toolPolicyMode=PDP requires tenantId so dexgate can match this workspace');

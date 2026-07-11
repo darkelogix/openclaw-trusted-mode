@@ -86,7 +86,7 @@ Then verify:
 2. Tenant variant mapping points to intended variant.
 3. Entitlement and tenant ID are correct.
 
-## 5) `[Trusted Mode BLOCKED] fetch failed`
+## 5) Service-backed status path fetch failed
 
 Meaning: plugin cannot reach PDP.
 
@@ -104,11 +104,11 @@ Check in order:
 3. If using WSL, test `host.docker.internal` endpoint.
 4. Keep `failClosed=true` in production.
 
-## 6) `[Trusted Mode ERROR] Hardening config invalid`
+## 6) Service-backed adapter config invalid
 
 Meaning: OpenClaw loaded the plugin, but `~/.openclaw/openclaw.json` still has an incomplete plugin config.
 
-For governed mode, rewrite the host config with:
+For service-backed mode, rewrite the host config with:
 
 ```powershell
 openclaw-trusted-mode-configure --tenantId <tenant-id> --gatewayId <gateway-id> --environment <environment> --pdpUrl http://<guard-pro-host>:8001/v1/authorize --certificationStatus LOCKDOWN_ONLY
@@ -119,7 +119,7 @@ That command:
 1. Adds `openclaw-trusted-mode` to `plugins.allow`.
 2. Sets `toolPolicyMode=PDP`.
 3. Writes `tenantId`, `gatewayId`, `environment`, `pdpUrl`, `failClosed=true`, and `allowedTenantIds=[tenantId]`.
-4. Replaces stale standalone `ALLOWLIST_ONLY` defaults that can block governed startup.
+4. Replaces stale standalone `ALLOWLIST_ONLY` defaults that can block service-backed startup.
 
 ## 7) License endpoint or support placeholders are unresolved
 

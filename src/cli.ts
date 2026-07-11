@@ -8,9 +8,11 @@ import { isLocalPdpUrl } from "./sdeGuidance";
 import { RuntimeCertificationStatus } from "./runtimeCertification";
 
 type DecisionResponse = {
-  decision: "allow" | "deny";
+  decision: "allow" | "constrain" | "deny";
   deny_code?: string;
   deny_reason?: string;
+  passport?: unknown;
+  constraints?: unknown;
   trace?: {
     policy_variant?: string;
   };
@@ -164,8 +166,8 @@ function remediationFor(
   if (runtimeCertificationStatus !== "CERTIFIED_ENFORCED") {
     return [
       "Run in LOCKDOWN_ONLY posture and block high-risk tools by default.",
-      "Certify this OpenClaw runtime version in COMPATIBILITY_MATRIX.md.",
-      "Set CERTIFICATION_STATUS=CERTIFIED_ENFORCED only after certification evidence is complete.",
+      "Add or confirm the validated OpenClaw runtime row in COMPATIBILITY_MATRIX.md.",
+      "Use CERTIFICATION_STATUS=CERTIFIED_ENFORCED only after approved compatibility and rollout evidence is present.",
     ];
   }
   if (status === "LOCKDOWN_ONLY") {
@@ -182,7 +184,7 @@ function remediationFor(
   if (hasConnectivityFailure && isLocalPdpUrl(CONFIG.pdpUrl)) {
     steps.unshift(
       "If you only need standalone hardening, switch the plugin to ALLOWLIST_ONLY.",
-      "If you want governed mode, obtain the licensed SDE runtime and deployment instructions from https://dexgate.ai/, then point PDP_URL at that environment."
+      "If you want governed mode, compare plans at https://dexgate.ai/pricing/ or download your licensed runtime materials from https://dexgate.ai/console/downloads/, then point PDP_URL at that environment and configure PDP_AUTH_TOKEN."
     );
   }
   return steps;

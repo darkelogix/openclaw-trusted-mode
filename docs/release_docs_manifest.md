@@ -1,4 +1,4 @@
-# OpenClaw Trusted Mode Release Docs Manifest
+# DexGate OpenClaw Adapter Release Docs Manifest
 
 This manifest defines what documentation is intended to remain in the release package for `openclaw-trusted-mode`.
 

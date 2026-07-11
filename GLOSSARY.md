@@ -1,30 +1,44 @@
 # Glossary
 
-This glossary defines terms used across the OpenClaw Trusted Mode plugin and related SDE runtime docs.
+This glossary defines terms used across the OpenClaw adapter package and related SDE runtime docs.
+
+## Capability Kernel (adapter role)
+
+This package is a **PEP adapter**, not the SDE kernel runtime.
+
+```text
+PROPOSE → OBSERVE → UPDATE → BOUND → DECIDE → ACT → LEARN
+```
+
+- **Capability Kernel**: Shared SDE architecture (Graph, Belief, Passport + control loop).
+- **Proposal**: Normalized tool-call request submitted for evaluation.
+- **Passport schema**: Decision contract / Decision SKU rules used by the PDP.
+- **Passport**: Scoped authorization semantics; PEPs enforce decisions before side effects.
+- **Free path**: Local hard gate (allowlist). **Paid path**: PDP-backed evaluation.
 
 ## Core architecture terms
 
-- **SDE**: Strategic Decision Engine. The policy/decision platform used to evaluate governance rules.
-- **PDP**: Policy Decision Point. The service endpoint that returns allow/deny decisions.
-- **PEP**: Policy Enforcement Point. The runtime component that enforces PDP decisions.
+- **SDE**: Strategic Decision Engine. Capability Kernel decision runtime used to evaluate governance rules.
+- **PDP**: Policy Decision Point. Service that evaluates Proposals against passport schemas and returns allow/deny/constrain decisions.
+- **PEP**: Policy Enforcement Point. The runtime component that enforces PDP (or local free-tier) decisions before side effects.
   In this project, the OpenClaw plugin is the PEP.
-- **OpenClaw plugin**: The `openclaw-trusted-mode` extension that intercepts tool calls and queries PDP.
-- **Policy pack**: Versioned JSON rule bundle used by PDP to decide allow/deny outcomes.
+- **OpenClaw plugin**: The adapter extension that can forward selected tool-call metadata to a configured PDP.
+- **Policy pack**: Versioned JSON rule bundle loaded by the PDP (passport schema content).
 - **Policy variant**: A named policy pack version (for example `guard-pro.v2026.02`).
 - **Entitlement**: Tenant-level authorization to use a decision capability (`decision_sku`).
 - **Tenant**: Logical customer/environment boundary for policy and entitlement isolation.
 
 ## Decision and evidence terms
 
-- **Decision SKU**: Canonical identifier for a governed decision contract
+- **Decision SKU**: Canonical identifier for a passport schema / decision contract
   (for example `openclaw.trusted_mode.authorize.v1`).
 - **Allow path**: Expected decision flow where a low-risk request returns `decision=allow`.
 - **Deny path**: Expected decision flow where a blocked request returns `decision=deny`.
-- **Fail-closed**: If PDP is unavailable, block tool execution for safety.
+- **Fail-closed**: If PDP is unavailable, block tool execution for safety (recommended for protected actions).
 - **Fail-open**: If PDP is unavailable, allow execution for availability.
 - **`decision_hash`**: Deterministic hash of decision output used for traceability.
 - **`decision_proof`**: Deterministic proof artifact (optionally signed) tied to a decision.
-- **`outcome_event`**: Operational event artifact emitted with decision context.
+- **`outcome_event`**: Operational event artifact emitted with decision context (LEARN inputs).
 - **Audit export**: JSON Lines (`.jsonl`) records for downstream audit/SIEM processing.
 
 ## Packaging and deployment terms

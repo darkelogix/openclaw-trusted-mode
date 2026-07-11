@@ -9,9 +9,14 @@ const HIGH_RISK_TOOLS = new Set([
   'remove_file',
   'write_file',
   'edit_file',
+  'apply_patch',
+  'patch_file',
+  'git_push',
+  'deploy_class',
+  'deploy_service',
 ]);
 
-type ToolActionKind = 'shell' | 'delete' | 'write' | 'generic';
+type ToolActionKind = 'shell' | 'delete' | 'write' | 'git' | 'deploy' | 'generic';
 
 function commandTextFromParams(params?: Record<string, unknown>): string {
   if (!params || typeof params !== 'object') return '';
@@ -71,20 +76,35 @@ function classifyToolAction(
   if (['write_file', 'edit_file'].includes(normalized)) {
     return 'write';
   }
+  if (['apply_patch', 'patch_file'].includes(normalized)) {
+    return 'write';
+  }
+  if (['git_push'].includes(normalized)) {
+    return 'git';
+  }
+  if (['deploy_class', 'deploy_service'].includes(normalized)) {
+    return 'deploy';
+  }
   return 'generic';
 }
 
 function lockDownActionMessage(kind: ToolActionKind): string {
   if (kind === 'shell') {
-    return 'Shell execution is disabled until this runtime is certified and moved to CERTIFIED_ENFORCED.';
+    return 'Shell execution is disabled until this runtime has a validated compatibility row and explicit CERTIFIED_ENFORCED configuration.';
   }
   if (kind === 'delete') {
-    return 'File deletion is disabled until this runtime is certified and moved to CERTIFIED_ENFORCED.';
+    return 'File deletion is disabled until this runtime has a validated compatibility row and explicit CERTIFIED_ENFORCED configuration.';
   }
   if (kind === 'write') {
-    return 'File write and edit actions are disabled until this runtime is certified and moved to CERTIFIED_ENFORCED.';
+    return 'File write and edit actions are disabled until this runtime has a validated compatibility row and explicit CERTIFIED_ENFORCED configuration.';
   }
-  return 'This high-risk action is disabled until this runtime is certified and moved to CERTIFIED_ENFORCED.';
+  if (kind === 'git') {
+    return 'Git-changing actions are disabled until this runtime has a validated compatibility row and explicit CERTIFIED_ENFORCED configuration.';
+  }
+  if (kind === 'deploy') {
+    return 'Deploy-class actions are disabled until this runtime has a validated compatibility row and explicit CERTIFIED_ENFORCED configuration.';
+  }
+  return 'This high-risk action is disabled until this runtime has a validated compatibility row and explicit CERTIFIED_ENFORCED configuration.';
 }
 
 function unsupportedActionMessage(kind: ToolActionKind): string {
@@ -156,7 +176,7 @@ export function certificationBlockReason(
       kind
     )}`;
   }
-  return `[Trusted Mode BLOCKED] dexgate blocked tool "${toolName}" because this OpenClaw runtime is LOCKDOWN_ONLY (not certified). Readonly governed validation is working, but ${lockDownActionMessage(
+  return `[Trusted Mode BLOCKED] dexgate blocked tool "${toolName}" because this OpenClaw runtime is LOCKDOWN_ONLY (not validated). Readonly governed validation is working, but ${lockDownActionMessage(
     kind
   )}`;
 }

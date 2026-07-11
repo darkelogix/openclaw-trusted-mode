@@ -40,6 +40,7 @@ function main() {
 
   const requiredKeys = [
     'pdpUrl',
+    'pdpAuthToken',
     'policyVariant',
     'pdpTimeoutMs',
     'failClosed',
@@ -60,7 +61,7 @@ function main() {
     fail('package.json missing openclaw.extensions entry for dist/index.js');
   }
   const publishedFiles = Array.isArray(pkg.files) ? pkg.files : [];
-  for (const requiredFile of ['dist/cli.js', 'dist/cliConfig.js', 'dist/cliPdpClient.js', 'dist/configureCli.js', 'dist/openclawConfig.js', 'dist/runtimePluginConfig.js']) {
+  for (const requiredFile of ['dist/cli.js', 'dist/cliConfig.js', 'dist/cliPdpClient.js', 'dist/configureCli.js', 'dist/openclawConfig.js', 'dist/passport.js', 'dist/runtimePluginConfig.js']) {
     if (!publishedFiles.includes(requiredFile)) {
       fail(`package.json files missing required published artifact: ${requiredFile}`);
     }
@@ -79,6 +80,7 @@ function main() {
   const runtimePluginConfig = fs.readFileSync(runtimePluginConfigPath, 'utf8');
   const runtimeUses = [
     'config.pdpUrl',
+    'config.pdpAuthToken',
     'config.policyVariant',
     'config.pdpTimeoutMs',
     'config.failClosed',

@@ -27,14 +27,14 @@ export function buildSdeRuntimeGuidance(_pdpUrl: string): string {
   return [
     'Governed mode requires a licensed SDE runtime; the public npm package installs the adapter only.',
     'If you only need standalone hardening, switch toolPolicyMode to ALLOWLIST_ONLY.',
-    'If you want governed mode, obtain SDE runtime and deployment instructions from https://dexgate.ai/, then point pdpUrl/PDP_URL at your licensed SDE environment.',
+    'If you want governed mode, compare plans at https://dexgate.ai/pricing/ or download your licensed runtime materials from https://dexgate.ai/console/downloads/, then point pdpUrl/PDP_URL at your licensed SDE environment and configure PDP_AUTH_TOKEN.',
   ].join(' ');
 }
 
 export function buildGovernedAccessGuidance(): string {
   return [
     'dexgate is reachable but denied this governed request.',
-    'Confirm this workspace has a licensed dexgate runtime and that tenantId, gatewayId, and environment match the runtime configuration.',
+    'Confirm this workspace has a licensed dexgate runtime and that tenantId, gatewayId, environment, and PDP_AUTH_TOKEN match the runtime configuration.',
   ].join(' ');
 }
 

@@ -42,11 +42,13 @@ export async function startLiveSdePdp(options?: {
 }) {
   const port = await getFreePort();
   const baseUrl = `http://127.0.0.1:${port}`;
+  const pdpAuthToken = options?.env?.PDP_AUTH_TOKEN || 'live-sde-test-token';
   const child = spawn('python', [SERVER_SCRIPT], {
     cwd: SDE_REPO,
     env: {
       ...process.env,
       ...options?.env,
+      PDP_AUTH_TOKEN: pdpAuthToken,
       TEST_PDP_PORT: String(port),
       TEST_PDP_ENTITLEMENTS_JSON: JSON.stringify(options?.entitlements || {}),
       TEST_PDP_TENANT_VARIANTS_JSON: JSON.stringify(options?.tenantVariants || {}),
@@ -70,6 +72,7 @@ export async function startLiveSdePdp(options?: {
 
   return {
     pdpUrl: `${baseUrl}/v1/authorize`,
+    pdpAuthToken,
     async stop() {
       if (child.exitCode !== null) return;
       child.kill();

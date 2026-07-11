@@ -16,14 +16,35 @@ function decide(payload) {
   }
 
   if (variant.includes('invalid')) {
-    return { decision: 'deny', deny_code: 'POLICY_SIGNATURE_INVALID' };
+    return { decision: 'deny', deny_code: 'POLICY_SIGNATURE_INVALID', simulated: true, governed: false, source: 'mock-pdp' };
   }
 
   if (tool === 'execute_shell' || tool === 'exec') {
-    return { decision: 'deny', deny_code: 'HIGH_BLAST' };
+    return { decision: 'deny', deny_code: 'HIGH_BLAST', simulated: true, governed: false, source: 'mock-pdp' };
   }
 
-  return { decision: 'allow' };
+  return {
+    decision: 'allow',
+    simulated: true,
+    governed: false,
+    source: 'mock-pdp',
+    passport: {
+      status: 'issued',
+      passport_id: 'pass-mock-openclaw-read-file',
+      schema_id: 'passport.schema.coding.prod_change.v1',
+      decision_sku: 'openclaw.trusted_mode.authorize.v1',
+      tenant_id: 'mock-tenant',
+      authority: { authorized_action: request.tool_name || 'read_file' },
+      scope: {
+        target: request.params?.path || 'read_file',
+        environment: 'dev',
+      },
+      expires_at: '2999-01-01T00:00:00Z',
+      revocation_status: 'not_revoked',
+      proof: { signature_status: 'mock' },
+      verify_contract: { failure_behavior: 'refuse' },
+    },
+  };
 }
 
 const server = http.createServer((req, res) => {
@@ -48,4 +69,5 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Mock PDP listening on http://localhost:${PORT}/v1/authorize`);
+  console.log('SIMULATED ONLY: this mock PDP is not the licensed dexgate SDE runtime and does not produce governed evidence.');
 });

@@ -22,6 +22,7 @@ describe('hardening config', () => {
     const v = validateHardeningConfig({ toolPolicyMode: 'PDP' });
     expect(v.ok).toBe(false);
     expect(v.issues.join(' ')).toMatch(/requires pdpUrl/);
+    expect(v.issues.join(' ')).toMatch(/requires pdpAuthToken/);
     expect(v.issues.join(' ')).toMatch(/requires tenantId/);
     expect(v.issues.join(' ')).toMatch(/requires gatewayId/);
     expect(v.issues.join(' ')).toMatch(/requires environment/);

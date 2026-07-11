@@ -14,6 +14,8 @@ import {
 } from './hardening';
 import { mergeDefinedConfig, readRuntimePluginConfig } from './runtimePluginConfig';
 import { maybeAppendSdeRuntimeGuidance } from './sdeGuidance';
+import { buildTelemetryConfig, sendTelemetryEvent } from './telemetry';
+import { validatePdpPassport } from './passport';
 
 export default function register(api: PluginApi) {
   const config = mergeDefinedConfig(readRuntimePluginConfig(), (api.config || {}) as Record<string, unknown>) as {
@@ -34,6 +36,10 @@ export default function register(api: PluginApi) {
     allowedTools?: string[];
     requireTenantId?: boolean;
     allowedTenantIds?: string[];
+    telemetryOptIn?: boolean;
+    telemetryUrl?: string;
+    telemetryInstallId?: string;
+    telemetryTimeoutMs?: number;
   };
   const pdpUrl = config.pdpUrl || 'http://localhost:8001/v1/authorize';
   const pdpAuthToken = typeof config.pdpAuthToken === 'string'
@@ -54,12 +60,18 @@ export default function register(api: PluginApi) {
   const highRiskTools = config.highRiskTools;
   const toolPolicyMode = normalizeToolPolicyMode(config.toolPolicyMode);
   const allowedTools = config.allowedTools;
+  const telemetryConfig = buildTelemetryConfig({
+    ...config,
+    toolPolicyMode,
+    certificationStatus,
+  });
   const hardeningValidation = validateHardeningConfig({
     toolPolicyMode,
     allowedTools,
     requireTenantId: config.requireTenantId,
     allowedTenantIds: config.allowedTenantIds,
     pdpUrl,
+    pdpAuthToken,
     tenantId,
     gatewayId,
     environment,
@@ -71,7 +83,20 @@ export default function register(api: PluginApi) {
 
   const hook = 'before_tool_call';
   api.on(hook, async (event: ToolCallEvent): Promise<BeforeToolCallResult | void> => {
+    const recordTelemetry = async (fields: Record<string, unknown>) => {
+      await sendTelemetryEvent(telemetryConfig, 'adapter.evaluation', {
+        mode: toolPolicyMode,
+        ...fields,
+      });
+    };
+
     if (!hardeningValidation.ok) {
+      await recordTelemetry({
+        decision: 'deny',
+        reasonCode: 'CONFIG_INVALID',
+        source: 'local',
+        governed: false,
+      });
       return {
         block: true,
         blockReason: `[Trusted Mode BLOCKED] Hardening configuration invalid: ${hardeningValidation.issues.join(
@@ -81,6 +106,12 @@ export default function register(api: PluginApi) {
     }
 
     if (!isToolAllowedByPolicyMode(event.toolName, toolPolicyMode, allowedTools)) {
+      await recordTelemetry({
+        decision: 'deny',
+        reasonCode: 'LOCAL_ALLOWLIST_BLOCK',
+        source: 'local',
+        governed: false,
+      });
       return {
         block: true,
         blockReason: `[Trusted Mode BLOCKED] Tool "${event.toolName}" denied by allowlist policy mode.`,
@@ -88,6 +119,12 @@ export default function register(api: PluginApi) {
     }
 
     if (shouldBlockToolForCertification(certificationStatus, event.toolName, highRiskTools)) {
+      await recordTelemetry({
+        decision: 'deny',
+        reasonCode: 'CERT_LOCKDOWN_BLOCK',
+        source: 'local',
+        governed: false,
+      });
       return {
         block: true,
         blockReason: certificationBlockReason(certificationStatus, event.toolName, event.params || {}),
@@ -95,6 +132,12 @@ export default function register(api: PluginApi) {
     }
 
     if (toolPolicyMode === 'ALLOWLIST_ONLY') {
+      await recordTelemetry({
+        decision: 'allow',
+        reasonCode: 'LOCAL_ALLOWLIST_ALLOW',
+        source: 'local',
+        governed: false,
+      });
       return;
     }
 
@@ -141,24 +184,61 @@ export default function register(api: PluginApi) {
       if (!decision || typeof decision.decision !== 'string') {
         throw new Error(`[Trusted Mode ERROR] Invalid PDP response: missing decision`);
       }
+      const passportValidation = validatePdpPassport(decision);
+      if (!passportValidation.ok) {
+        throw new Error(`[Trusted Mode ERROR] Invalid PDP response: ${passportValidation.error}`);
+      }
 
       if (decision.decision === 'deny') {
         const reason = decision.deny_reason || decision.deny_code || 'Policy denied';
+        await recordTelemetry({
+          decision: 'deny',
+          reasonCode: decision.deny_code || 'PDP_DENY',
+          source: 'pdp',
+          governed: decision.simulated === true ? false : true,
+          simulated: decision.simulated === true,
+        });
         return { block: true, blockReason: `[Trusted Mode BLOCKED] ${reason}` };
       }
 
       if (decision.constraints) {
         enforceConstraints(event.params, decision.constraints);
+        await recordTelemetry({
+          decision: decision.decision,
+          reasonCode: decision.reasonCode || decision.deny_code || 'PDP_CONSTRAIN',
+          source: 'pdp',
+          governed: decision.simulated === true ? false : true,
+          simulated: decision.simulated === true,
+        });
         return { params: event.params || {} };
       }
+      await recordTelemetry({
+        decision: decision.decision,
+        reasonCode: decision.reasonCode || decision.deny_code || 'PDP_ALLOW',
+        source: 'pdp',
+        governed: decision.simulated === true ? false : true,
+        simulated: decision.simulated === true,
+      });
     } catch (err: any) {
       const baseMsg = err?.name === 'AbortError' ? `PDP timeout after ${pdpTimeoutMs}ms` : err?.message || 'PDP authorization failed';
       const msg = maybeAppendSdeRuntimeGuidance(baseMsg, pdpUrl);
       console.error(`[Trusted Mode ERROR]`, msg);
       if (failClosed) {
+        await recordTelemetry({
+          decision: 'deny',
+          reasonCode: 'PDP_UNAVAILABLE_FAIL_CLOSED',
+          source: 'local',
+          governed: false,
+        });
         return { block: true, blockReason: `[Trusted Mode BLOCKED] ${msg}` };
       }
       console.warn(`[Trusted Mode WARN] Fail-open enabled; allowing tool call.`);
+      await recordTelemetry({
+        decision: 'allow',
+        reasonCode: 'PDP_UNAVAILABLE_FAIL_OPEN',
+        source: 'local',
+        governed: false,
+      });
     } finally {
       clearTimeout(timeout);
     }

@@ -20,6 +20,27 @@ Thumbs.db
 # Env/local config
 .env
 .env.*
+!.env.example
+local_secrets/
+local-secrets/
+secrets.local/
+
+# Confidential/private material
+/private_ip_notes/
+/patent_materials/
+/legal/
+/strategy/
+/contracts_drafts_private/
+/uploaded_patent_materials/
+/private_customer_data/
+/customer_data_private/
+/private_financial_records/
+/financial_records_private/
+*patent*.docx
+*Patent*.docx
+*claims*.docx
+*Claims*.docx
+*Application*Specification*.docx
 
 # Python caches (used by helper scripts)
 __pycache__/

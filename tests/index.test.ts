@@ -44,6 +44,23 @@ function startMockPdpServer(
   });
 }
 
+function validPassport(overrides: Record<string, unknown> = {}) {
+  return {
+    status: 'issued',
+    passport_id: 'pass-test-openclaw',
+    schema_id: 'passport.schema.coding.prod_change.v1',
+    decision_sku: 'openclaw.trusted_mode.authorize.v1',
+    tenant_id: 'trial-tenant',
+    authority: { authorized_action: 'read_file' },
+    scope: { target: 'README.md', environment: 'test' },
+    expires_at: '2999-01-01T00:00:00Z',
+    revocation_status: 'not_revoked',
+    proof: { signature_status: 'unsigned' },
+    verify_contract: { failure_behavior: 'refuse' },
+    ...overrides,
+  };
+}
+
 describe('trusted mode plugin', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
@@ -103,6 +120,7 @@ describe('trusted mode plugin', () => {
       toolPolicyMode: 'PDP',
       failClosed: true,
       certificationStatus: 'LOCKDOWN_ONLY',
+      pdpAuthToken: 'test-token',
       tenantId: 'darkelogix',
       gatewayId: 'gw-dev',
       environment: 'dev',
@@ -132,6 +150,7 @@ describe('trusted mode plugin', () => {
       toolPolicyMode: 'PDP',
       failClosed: true,
       certificationStatus: 'LOCKDOWN_ONLY',
+      pdpAuthToken: 'test-token',
       tenantId: 'darkelogix',
       gatewayId: 'gw-dev',
       environment: 'dev',
@@ -160,6 +179,7 @@ describe('trusted mode plugin', () => {
       toolPolicyMode: 'PDP',
       failClosed: true,
       certificationStatus: 'CERTIFIED_ENFORCED',
+      pdpAuthToken: 'test-token',
       tenantId: 'trial-tenant',
       gatewayId: 'gw-test',
       environment: 'test',
@@ -175,6 +195,29 @@ describe('trusted mode plugin', () => {
     expect((result as { blockReason: string }).blockReason).toContain('ALLOWLIST_ONLY');
   });
 
+  it('fails closed before PDP call when auth token is missing', async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+
+    const { api, getHandler } = createApi({
+      toolPolicyMode: 'PDP',
+      failClosed: true,
+      certificationStatus: 'CERTIFIED_ENFORCED',
+      tenantId: 'trial-tenant',
+      gatewayId: 'gw-test',
+      environment: 'test',
+    });
+
+    register(api as never);
+    const result = await getHandler()({ toolName: 'read_file', params: { path: 'README.md' } });
+
+    expect(result).toEqual({
+      block: true,
+      blockReason: expect.stringContaining('pdpAuthToken'),
+    });
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
   it('fails closed when the PDP returns malformed JSON', async () => {
     const { server, url } = await startMockPdpServer((_req, res) => {
       res.writeHead(200, { 'content-type': 'application/json' });
@@ -187,6 +230,7 @@ describe('trusted mode plugin', () => {
         pdpUrl: url,
         failClosed: true,
         certificationStatus: 'CERTIFIED_ENFORCED',
+        pdpAuthToken: 'test-token',
         tenantId: 'trial-tenant',
         gatewayId: 'gw-test',
         environment: 'test',
@@ -198,6 +242,68 @@ describe('trusted mode plugin', () => {
       expect(result).toEqual({
         block: true,
         blockReason: expect.stringContaining('Invalid PDP response: malformed JSON'),
+      });
+    } finally {
+      server.close();
+    }
+  });
+
+  it('allows when PDP allow includes a valid Passport', async () => {
+    const { server, url } = await startMockPdpServer((req, res) => {
+      expect(req.headers.authorization).toBe('Bearer test-token');
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({
+        decision: 'allow',
+        passport: validPassport(),
+        trace: { traceId: 'trace-allow' },
+      }));
+    });
+
+    try {
+      const { api, getHandler } = createApi({
+        toolPolicyMode: 'PDP',
+        pdpUrl: url,
+        failClosed: true,
+        certificationStatus: 'CERTIFIED_ENFORCED',
+        pdpAuthToken: 'test-token',
+        tenantId: 'trial-tenant',
+        gatewayId: 'gw-test',
+        environment: 'test',
+      });
+
+      register(api as never);
+      const result = await getHandler()({ toolName: 'read_file', params: { path: 'README.md' } });
+
+      expect(result).toBeUndefined();
+    } finally {
+      server.close();
+    }
+  });
+
+  it('fails closed when PDP allow omits Passport', async () => {
+    const { server, url } = await startMockPdpServer((_req, res) => {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ decision: 'allow', trace: { traceId: 'trace-missing-passport' } }));
+    });
+
+    try {
+      const { api, getHandler } = createApi({
+        toolPolicyMode: 'PDP',
+        pdpUrl: url,
+        failClosed: true,
+        certificationStatus: 'CERTIFIED_ENFORCED',
+        pdpAuthToken: 'test-token',
+        tenantId: 'trial-tenant',
+        gatewayId: 'gw-test',
+        environment: 'test',
+      });
+
+      register(api as never);
+      const result = await getHandler()({ toolName: 'read_file', params: { path: 'README.md' } });
+
+      expect(result).toEqual({
+        block: true,
+        blockReason: expect.stringContaining('passport'),
       });
     } finally {
       server.close();
@@ -216,6 +322,7 @@ describe('trusted mode plugin', () => {
         failClosed: false,
         pdpTimeoutMs: 25,
         certificationStatus: 'CERTIFIED_ENFORCED',
+        pdpAuthToken: 'test-token',
         tenantId: 'trial-tenant',
         gatewayId: 'gw-test',
         environment: 'test',
@@ -244,6 +351,7 @@ describe('trusted mode plugin', () => {
               config: {
                 toolPolicyMode: 'PDP',
                 pdpUrl: 'http://127.0.0.1:9/v1/authorize',
+                pdpAuthToken: 'test-token',
                 tenantId: 'darkelogix',
                 gatewayId: 'gw-dev',
                 environment: 'dev',

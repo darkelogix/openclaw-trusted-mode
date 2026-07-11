@@ -1,203 +1,111 @@
-# Start Here: Self-Service Setup
+# Start Here: OpenClaw Trusted Mode
 
-This guide assumes an npm-first customer path:
+Use this guide to choose the right path:
 
-- install the public adapter/plugin from npm
-- use standalone mode immediately if you only need local hardening
-- obtain the licensed SDE runtime and deployment materials through the Darkelogix customer console only if you want governed mode
+- Free local hardening: install the public npm package and block high-risk OpenClaw actions locally.
+- Paid dexgate governed mode: install the public npm package, then use the dexgate customer console to obtain the licensed SDE runtime, deployment bundle, PDP URL, and PDP auth token.
 
 Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 
-## Acronym Expansions
+## 1. Install The Public Adapter
 
-- `SDE`: Strategic Decision Engine
-- `PDP`: Policy Decision Point
-- `CLI`: Command Line Interface
-
-This guide is the single entrypoint for first-time users of:
-
-- `<openclaw-trusted-mode-path>` (plugin)
-- `<sde-enterprise-path>` (Strategic Decision Engine (SDE) Policy Decision Point (PDP) runtime)
-
-Goal: download, install, configure, test, and run without direct support.
-
-There are two valid setup paths:
-
-- npm package: public adapter/plugin only
-- customer console: licensed SDE runtime, deployment bundles, and governed rollout instructions
-
-Then choose one of these runtime paths:
-
-- Free standalone plugin hardening:
-  - local allowlist-only mode
-  - no SDE PDP required
-- SDE-backed governed mode:
-  - requires `<sde-enterprise-path>`
-  - adds PDP authorization, local integrity checks, and entitlements
-
-Org-specific values are centralized in `<org-values-file>`.
-
-## 0) One-command bootstrap (recommended)
-
-If you are coming from the public npm package, you can install it first with:
+Create a clean directory on the OpenClaw host:
 
 ```powershell
-npm install @dexgate/openclaw-trusted-mode
-```
-
-Use the bootstrap path when you want the guided local setup flow.
-
-
-```powershell
-powershell -ExecutionPolicy Bypass -File <bootstrap-self-service-script-path>
-```
-
-Optional (also install `sde-cli`):
-
-```powershell
-powershell -ExecutionPolicy Bypass -File <bootstrap-self-service-script-path> -InstallSdeCli
-```
-
-## 1) Prerequisites
-
-- Windows PowerShell 7+ or bash
-- Git
-- Docker Desktop (or Docker Engine + Compose)
-- Node.js 22.x (plugin build/runtime)
-- Python 3.11+ (for `sde-cli` and plugin matrix test)
-- OpenClaw Command Line Interface (CLI) available in shell as `openclaw`
-
-Quick version checks:
-
-```powershell
-node --version
-python --version
-docker --version
-docker compose version
-openclaw --version
-```
-
-## 2) Acquire the two repos
-
-Option A: you already have them locally at:
-
-- `<openclaw-trusted-mode-path>`
-- `<sde-enterprise-path>`
-
-Option B: clone them:
-
-```powershell
-git clone <openclaw-trusted-mode-repo-url> <openclaw-trusted-mode-path>
-git clone <sde-enterprise-repo-url> <sde-enterprise-path>
-```
-
-## 3) Configure known-good local defaults
-
-1. Create local SDE env file:
-
-```powershell
-Copy-Item <sde-enterprise-path>\.env.example <sde-enterprise-path>\.env -Force
-```
-
-2. Use the default tenant/policy mapping (already present in repo):
-- `<sde-enterprise-path>\ops\entitlements.json`
-- `<sde-enterprise-path>\ops\tenant_variants.json`
-
-3. Optional plugin config template:
-- `<openclaw-trusted-mode-path>\openclaw.user-config.entry.example.json`
-
-## 4) Free standalone plugin install
-
-Use this path if you want practical local hardening without SDE PDP.
-
-```powershell
-Set-Location <openclaw-trusted-mode-path>
-npm install
-npm run build
-openclaw plugins install <openclaw-trusted-mode-path>
+mkdir dexgate-openclaw-first-success
+cd dexgate-openclaw-first-success
+npm init -y
+npm install @dexgate/openclaw-trusted-mode@1.0.7
+openclaw plugins install ./node_modules/@dexgate/openclaw-trusted-mode
 openclaw plugins info openclaw-trusted-mode
 ```
 
-Expected: plugin status is `loaded`.
+Expected: the plugin is loaded by OpenClaw.
 
-Default free posture:
+## 2. Free Local Hardening
 
-- `toolPolicyMode = ALLOWLIST_ONLY`
-- `allowedTools = ["read_file", "list_files", "search_files"]`
-- shell/write/delete tools blocked locally
-
-## 5) Build and run SDE PDP (Policy Decision Point)
-
-Use this governed path only after you have licensed access to SDE. The supported customer-facing way to obtain the runtime, bundles, and instructions is through the Darkelogix customer console, not by assuming direct source-repo access.
-
-
-Use the hardened profile for all production-style and release validation runs.
+Run the local check:
 
 ```powershell
-Set-Location <sde-enterprise-path>
-docker compose -f ops/docker-compose.pdp.yml -f ops/docker-compose.pdp.hardened.yml up --build -d
+npx openclaw-trusted-mode-check --json
 ```
 
-Verify health:
+Expected free posture:
+
+- `governed: false`
+- local hardening source
+- read/search/list workflows allowed
+- shell, write, delete, and other mutating tools blocked unless explicitly configured
+
+This is useful local protection, but it is not SDE-backed governance evidence.
+
+Optional telemetry is off by default. To opt in to coarse product telemetry, set:
 
 ```powershell
-curl -s http://localhost:8001/healthz
+$env:DEXGATE_TELEMETRY_OPT_IN='true'
 ```
 
-Expected:
+Telemetry does not include prompts, commands, file paths, tool parameters, PDP payloads, or policy contents.
 
-```json
-{"status":"ok"}
-```
+## 3. Paid dexgate Governed Mode
 
-## 6) Build and install plugin for SDE-backed mode
+Use this path only after you have licensed access through dexgate.
+
+1. Sign in to <https://dexgate.ai/console/downloads/>.
+2. Download the SDE Runtime bundle, customer config package, runtime secrets package, checksums, and bootstrap script.
+3. Install the runtime on the central Linux Docker host and confirm `http://<dexgate-host>:8001/healthz`.
+4. Configure each OpenClaw environment host with the portal values.
+
+Configure the plugin:
 
 ```powershell
-Set-Location <openclaw-trusted-mode-path>
+npx --no-install openclaw-trusted-mode-configure `
+  --tenantId <tenant-id> `
+  --gatewayId <gateway-id> `
+  --environment <environment> `
+  --pdpUrl http://<dexgate-host>:8001/v1/authorize `
+  --pdpAuthToken <PDP_AUTH_TOKEN from runtime-secrets.env> `
+  --certificationStatus LOCKDOWN_ONLY
+```
+
+Run the governed check:
+
+```powershell
+$env:TENANT_ID='<tenant-id>'
+$env:GATEWAY_ID='<gateway-id>'
+$env:ENVIRONMENT='<environment>'
+$env:PDP_URL='http://<dexgate-host>:8001/v1/authorize'
+$env:PDP_HEALTH_URL='http://<dexgate-host>:8001/healthz'
+$env:PDP_AUTH_TOKEN='<PDP_AUTH_TOKEN from runtime-secrets.env>'
+npx --no-install openclaw-trusted-mode-check --json
+```
+
+Expected governed posture:
+
+- the check reaches the licensed SDE PDP
+- requests include the PDP bearer token
+- results include a GateDecision and policy context
+- production-bound allowed actions can include passport and verification fields
+
+Do not commit `PDP_AUTH_TOKEN` or paste it into shared tickets.
+
+## 4. Customer Setup Docs
+
+Use the portal and customer docs for deployment work:
+
+- dexgate customer quickstart: <https://dexgate.ai/docs/dexgate/quickstart/>
+- full customer setup tutorial: <https://dexgate.ai/docs/dexgate/customer-setup/>
+- compatibility matrix: <https://dexgate.ai/compatibility/>
+
+## 5. Source Contributor Path
+
+Use the source repo only when you are developing or validating the adapter itself:
+
+```powershell
 npm install
 npm run build
-openclaw plugins install <openclaw-trusted-mode-path>
-openclaw plugins info openclaw-trusted-mode
-openclaw-trusted-mode-configure --tenantId <tenant-id> --gatewayId <gateway-id> --environment <environment> --pdpUrl http://<dexgate-host>:8001/v1/authorize --pdpAuthToken <runtime-token> --certificationStatus LOCKDOWN_ONLY
+npm test
+npm run local-hardening-check
 ```
 
-Expected: plugin status is `loaded`.
-
-## 7) Run first-success smoke tests
-
-Standalone free-mode smoke test:
-
-1. Confirm `read_file` still works in OpenClaw.
-2. Confirm high-risk actions such as `exec` are blocked.
-
-SDE-backed smoke test:
-
-```powershell
-Set-Location <sde-enterprise-path>
-powershell -ExecutionPolicy Bypass -File scripts\first_success_smoke.ps1
-```
-
-Run plugin startup health:
-
-```powershell
-Set-Location <openclaw-trusted-mode-path>
-powershell -ExecutionPolicy Bypass -File scripts\first_success_smoke.ps1
-```
-
-## 8) Day-2 operations docs
-
-- Primary technical ops: `<openclaw-trusted-mode-path>\OPERATIONS_GUIDE.md`
-- Non-technical runbook: `<openclaw-trusted-mode-path>\RUNBOOK_NON_TECHNICAL.md`
-- SDE deployment docs: `<sde-enterprise-path>\README.md`
-
-## 9) Remaining org-specific values to fill once
-
-For full production self-service, define these values once in your operations documentation:
-
-1. `<openclaw-trusted-mode-repo-url>`
-2. `<sde-enterprise-repo-url>`
-3. `<license-server-fqdn>`
-4. Support contact block (owner/channel/email)
-5. Private registry/image coordinates (if used)
-
-These values are release-ops inputs, not blockers for local build/test validation.
+Repo-local mock PDP examples are simulated unless they point at a licensed dexgate SDE runtime with a valid PDP auth token. Treat mock output as adapter validation only, not production evidence.

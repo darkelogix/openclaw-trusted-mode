@@ -67,8 +67,11 @@ liveSdeDescribe('live SDE integration', () => {
     const { api, getHandler } = createApi({
       toolPolicyMode: 'PDP',
       pdpUrl: server.pdpUrl,
+      pdpAuthToken: server.pdpAuthToken,
       failClosed: true,
       tenantId: 'trial-tenant',
+      gatewayId: 'gw-live',
+      environment: 'prod',
       policyVariant: 'guard-pro.v2026.02',
       certificationStatus: 'CERTIFIED_ENFORCED',
     });
@@ -94,8 +97,11 @@ liveSdeDescribe('live SDE integration', () => {
     const { api, getHandler } = createApi({
       toolPolicyMode: 'PDP',
       pdpUrl: server.pdpUrl,
+      pdpAuthToken: server.pdpAuthToken,
       failClosed: true,
       tenantId: 'trial-tenant',
+      gatewayId: 'gw-live',
+      environment: 'prod',
       policyVariant: 'guard-pro.v2026.02',
       certificationStatus: 'CERTIFIED_ENFORCED',
     });
@@ -118,8 +124,11 @@ liveSdeDescribe('live SDE integration', () => {
     const { api, getHandler } = createApi({
       toolPolicyMode: 'PDP',
       pdpUrl: server.pdpUrl,
+      pdpAuthToken: server.pdpAuthToken,
       failClosed: true,
       tenantId: 'trial-tenant',
+      gatewayId: 'gw-live',
+      environment: 'prod',
       policyVariant: 'guard-pro.v2026.02',
       certificationStatus: 'CERTIFIED_ENFORCED',
     });
@@ -133,7 +142,7 @@ liveSdeDescribe('live SDE integration', () => {
     });
   });
 
-  it('requires gateway_id through the live PDP when license gateway limits are enforced', async () => {
+  it('fails local validation before PDP when gateway_id is missing', async () => {
     const tempDir = await mkdtemp(path.join(os.tmpdir(), 'openclaw-gateway-limit-'));
     tempDirs.push(tempDir);
     const server = await startLiveSdePdp({
@@ -154,6 +163,7 @@ liveSdeDescribe('live SDE integration', () => {
     const { api, getHandler } = createApi({
       toolPolicyMode: 'PDP',
       pdpUrl: server.pdpUrl,
+      pdpAuthToken: server.pdpAuthToken,
       failClosed: true,
       tenantId: 'trial-tenant',
       policyVariant: 'guard-pro.v2026.02',
@@ -165,11 +175,11 @@ liveSdeDescribe('live SDE integration', () => {
 
     expect(result).toEqual({
       block: true,
-      blockReason: expect.stringContaining('gateway_id is required when max_gateways is enforced by license'),
+      blockReason: expect.stringContaining('gatewayId'),
     });
   });
 
-  it('requires environment through the live PDP when license environment limits are enforced', async () => {
+  it('fails local validation before PDP when environment is missing', async () => {
     const tempDir = await mkdtemp(path.join(os.tmpdir(), 'openclaw-environment-limit-'));
     tempDirs.push(tempDir);
     const server = await startLiveSdePdp({
@@ -190,8 +200,10 @@ liveSdeDescribe('live SDE integration', () => {
     const { api, getHandler } = createApi({
       toolPolicyMode: 'PDP',
       pdpUrl: server.pdpUrl,
+      pdpAuthToken: server.pdpAuthToken,
       failClosed: true,
       tenantId: 'trial-tenant',
+      gatewayId: 'gw-live',
       policyVariant: 'guard-pro.v2026.02',
       certificationStatus: 'CERTIFIED_ENFORCED',
     });
@@ -201,7 +213,7 @@ liveSdeDescribe('live SDE integration', () => {
 
     expect(result).toEqual({
       block: true,
-      blockReason: expect.stringContaining('environment is required when max_environments is enforced by license'),
+      blockReason: expect.stringContaining('environment'),
     });
   });
 });

@@ -32,7 +32,7 @@ npm run verify-changelog-version
 npm run verify-plugin-schema-contract
 ```
 
-4. Run the release/security checks you want to gate publication on:
+4. Run the release checks you want to gate publication on:
 
 ```bash
 npm test
@@ -50,7 +50,7 @@ npm pack --dry-run
 
 - Publish only the MIT adapter/plugin package to npm.
 - Do not imply that npm installation grants rights to the proprietary `sde-enterprise` runtime.
-- Keep the OpenClaw plugin install docs explicit: npm is a distribution channel for the package contents, while governed operation still depends on configuration and optional SDE runtime access.
+- Keep the OpenClaw plugin install docs explicit: npm is a distribution channel for the package contents, while service-backed operation still depends on configuration and optional SDE runtime access.
 
 ## Publish Command
 

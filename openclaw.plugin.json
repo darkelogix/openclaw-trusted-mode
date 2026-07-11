@@ -1,15 +1,19 @@
 {
   "id": "openclaw-trusted-mode",
-  "name": "Trusted Mode Governance",
+  "name": "DexGate OpenClaw Adapter",
   "version": "1.0.7",
-  "description": "Trusted Mode hardening with optional SDE-PDP governance and local integrity checks",
+  "description": "Local hardening first, optional dexgate PDP + Passport governance second",
   "author": "Automated Decision Systems, LLC",
   "hooks": ["before_tool_call"],
   "configSchema": {
     "type": "object",
     "properties": {
       "pdpUrl": { "type": "string", "default": "http://localhost:8001/v1/authorize" },
+      "pdpAuthToken": { "type": "string" },
       "policyVariant": { "type": "string", "default": "guard-pro.v2026.02" },
+      "decisionSku": { "type": "string", "default": "openclaw.trusted_mode.authorize.v1" },
+      "beachheadProfile": { "type": "string", "default": "prod_change" },
+      "passportSchemaId": { "type": "string", "default": "passport.schema.coding.prod_change.v1" },
       "pdpTimeoutMs": { "type": "number", "default": 5000 },
       "failClosed": { "type": "boolean", "default": true },
       "tenantId": { "type": "string" },
@@ -29,7 +33,7 @@
       "highRiskTools": {
         "type": "array",
         "items": { "type": "string" },
-        "default": ["exec", "execute_shell", "run_shell_command", "shell", "delete_file", "remove_file", "write_file", "edit_file"]
+        "default": ["exec", "execute_shell", "run_shell_command", "shell", "delete_file", "remove_file", "write_file", "edit_file", "apply_patch", "patch_file", "git_push", "deploy_class", "deploy_service"]
       },
       "toolPolicyMode": {
         "type": "string",

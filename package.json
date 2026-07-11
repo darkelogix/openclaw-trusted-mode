@@ -1,7 +1,7 @@
 {
   "name": "@dexgate/openclaw-trusted-mode",
   "version": "1.0.7",
-  "description": "MIT-licensed OpenClaw Trusted Mode plugin with standalone hardening and optional dexgate-backed governance",
+  "description": "MIT-licensed OpenClaw adapter package with standalone hardening and optional DexGate service integration",
   "license": "MIT",
   "main": "dist/index.js",
   "exports": {
@@ -9,7 +9,8 @@
   },
   "bin": {
     "openclaw-trusted-mode-check": "./dist/cli.js",
-    "openclaw-trusted-mode-configure": "./dist/configureCli.js"
+    "openclaw-trusted-mode-configure": "./dist/configureCli.js",
+    "openclaw-local-hardening-check": "./dist/localHardeningCheckCli.js"
   },
   "homepage": "https://dexgate.ai/openclaw/",
   "repository": {
@@ -21,10 +22,10 @@
   },
   "keywords": [
     "openclaw",
-    "trusted-mode",
-    "policy-enforcement",
-    "governance",
-    "security",
+    "adapter",
+    "local-hardening",
+    "policy-checks",
+    "workflow-controls",
     "dexgate"
   ],
   "publishConfig": {
@@ -45,20 +46,18 @@
     "dist/contextCurator.js",
     "dist/hardening.js",
     "dist/index.js",
+    "dist/localHardeningCheckCli.js",
     "dist/openclawConfig.js",
     "dist/packageVersion.js",
+    "dist/passport.js",
     "dist/runtimePluginConfig.js",
     "dist/runtimeCertification.js",
     "dist/sdeGuidance.js",
+    "dist/telemetry.js",
     "openclaw.plugin.json",
     "openclaw.user-config.entry.example.json",
     "README.md",
-    "START_HERE.md",
-    "GLOSSARY.md",
-    "SELF_SERVICE_FAQ.md",
-    "CHANGELOG.md",
-    "attestation/trusted_mode_attest_v1.json",
-    "attestation/trusted_mode_attest_v1.sig"
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsc",
@@ -76,6 +75,7 @@
     "adversarial-check": "node scripts/run_adversarial_checks.js",
     "startup-health-check": "node scripts/verify_startup_health.js",
     "clean-room-smoke": "powershell -ExecutionPolicy Bypass -File scripts/run_clean_room_smoke.ps1",
+    "local-hardening-check": "npm run build -- --pretty false && node dist/localHardeningCheckCli.js",
     "performance-benchmark": "node scripts/run_performance_benchmark.js",
     "test-pack-matrix": "python scripts/run_test_pack_matrix.py",
     "update-compatibility-matrix": "node scripts/update_compatibility_matrix.js",
