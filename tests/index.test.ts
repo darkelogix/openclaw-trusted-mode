@@ -319,6 +319,12 @@ describe('trusted mode plugin', () => {
           repoUrl: 'https://github.com/example/repo',
           branch: 'main',
           commitSha: 'abc123',
+          githubPrUrl: 'https://github.com/example/repo/pull/42',
+          githubPrNumber: 42,
+          checkRunUrl: 'https://github.com/example/repo/actions/runs/99',
+          githubWorkflow: 'deploy',
+          githubRunId: 99,
+          deploymentEnvironment: 'prod',
         },
       });
 
@@ -329,6 +335,12 @@ describe('trusted mode plugin', () => {
       expect(captured.inputs.action_request.origin.repo_url).toBe('https://github.com/example/repo');
       expect(captured.inputs.action_request.origin.branch).toBe('main');
       expect(captured.inputs.action_request.origin.commit_sha).toBe('abc123');
+      expect(captured.inputs.action_request.origin.github_pr_url).toBe('https://github.com/example/repo/pull/42');
+      expect(captured.inputs.action_request.origin.github_pr_number).toBe('42');
+      expect(captured.inputs.action_request.origin.github_check_url).toBe('https://github.com/example/repo/actions/runs/99');
+      expect(captured.inputs.action_request.origin.github_workflow).toBe('deploy');
+      expect(captured.inputs.action_request.origin.github_run_id).toBe('99');
+      expect(captured.inputs.action_request.origin.deployment_environment).toBe('prod');
     } finally {
       server.close();
     }
