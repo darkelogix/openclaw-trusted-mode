@@ -243,6 +243,38 @@ describe('trusted mode plugin', () => {
         block: true,
         blockReason: expect.stringContaining('Invalid PDP response: malformed JSON'),
       });
+      // Regression: outer catch already prefixes [Trusted Mode ERROR]/message must not double-tag.
+      expect(String(result.blockReason)).not.toMatch(/\[Trusted Mode ERROR\].*\[Trusted Mode ERROR\]/);
+      expect(String(result.blockReason).match(/Invalid PDP response/g)?.length || 0).toBe(1);
+    } finally {
+      server.close();
+    }
+  });
+
+  it('fails closed when PDP allow omits Passport without double error tags', async () => {
+    const { server, url } = await startMockPdpServer((_req, res) => {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ decision: 'allow', trace: { traceId: 'trace-missing-passport' } }));
+    });
+
+    try {
+      const { api, getHandler } = createApi({
+        toolPolicyMode: 'PDP',
+        pdpUrl: url,
+        failClosed: true,
+        certificationStatus: 'CERTIFIED_ENFORCED',
+        pdpAuthToken: 'test-token',
+        tenantId: 'trial-tenant',
+        gatewayId: 'gw-test',
+        environment: 'test',
+      });
+
+      register(api as never);
+      const result = await getHandler()({ toolName: 'read_file', params: { path: 'README.md' } });
+
+      expect(result.block).toBe(true);
+      expect(String(result.blockReason)).toContain('passport');
+      expect(String(result.blockReason)).not.toMatch(/\[Trusted Mode ERROR\].*\[Trusted Mode ERROR\]/);
     } finally {
       server.close();
     }

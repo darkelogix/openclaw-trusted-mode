@@ -224,15 +224,16 @@ export default function register(api: PluginApi) {
       try {
         decision = await res.json();
       } catch {
-        throw new Error('[Trusted Mode ERROR] Invalid PDP response: malformed JSON');
+        // Do not prefix with [Trusted Mode ERROR]; outer catch already logs that tag.
+        throw new Error('Invalid PDP response: malformed JSON');
       }
 
       if (!decision || typeof decision.decision !== 'string') {
-        throw new Error(`[Trusted Mode ERROR] Invalid PDP response: missing decision`);
+        throw new Error('Invalid PDP response: missing decision');
       }
       const passportValidation = validatePdpPassport(decision);
       if (!passportValidation.ok) {
-        throw new Error(`[Trusted Mode ERROR] Invalid PDP response: ${passportValidation.error}`);
+        throw new Error(`Invalid PDP response: ${passportValidation.error}`);
       }
 
       if (decision.decision === 'deny') {
