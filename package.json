@@ -25,7 +25,9 @@
     "policy-enforcement",
     "governance",
     "security",
-    "dexgate"
+    "dexgate",
+    "clawhub",
+    "local-hardening"
   ],
   "publishConfig": {
     "access": "public"
@@ -33,7 +35,19 @@
   "openclaw": {
     "extensions": [
       "dist/index.js"
-    ]
+    ],
+    "compat": {
+      "pluginApi": ">=2026.3.24"
+    },
+    "build": {
+      "openclawVersion": "2026.4.8"
+    },
+    "install": {
+      "npmSpec": "@dexgate/openclaw-trusted-mode",
+      "clawhubSpec": "@dexgate/openclaw-trusted-mode",
+      "defaultChoice": "npm",
+      "minHostVersion": ">=2026.4.8"
+    }
   },
   "files": [
     "dist/attestation.js",
@@ -54,6 +68,7 @@
     "openclaw.user-config.entry.example.json",
     "README.md",
     "START_HERE.md",
+    "CLAWHUB.md",
     "GLOSSARY.md",
     "SELF_SERVICE_FAQ.md",
     "CHANGELOG.md",
@@ -84,7 +99,8 @@
     "trusted-mode-check": "node dist/cli.js",
     "trusted-mode-configure": "node dist/configureCli.js",
     "trusted-mode-check:mock": "node scripts/mock_pdp.js",
-    "lint-docs-terminology": "python scripts/lint_docs_terminology.py"
+    "lint-docs-terminology": "python scripts/lint_docs_terminology.py",
+    "clawhub:validate": "clawhub package validate ."
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
