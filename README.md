@@ -1,3 +1,12 @@
+> [!CAUTION]
+> **This repository has moved and is archived.**
+>
+> **Canonical home:** [dexgate-ai/openclaw-trusted-mode](https://github.com/dexgate-ai/openclaw-trusted-mode)
+>
+> Do not open new issues or PRs here. Clone, push, and run CI against the **dexgate-ai** organization.
+> Product site: [dexgate.ai](https://dexgate.ai) · X: [@dexgateAI](https://x.com/dexgateAI)
+
+---
 # @dexgate/openclaw-trusted-mode
 
 [![npm version](https://img.shields.io/npm/v/%40dexgate%2Fopenclaw-trusted-mode)](https://www.npmjs.com/package/@dexgate/openclaw-trusted-mode)
