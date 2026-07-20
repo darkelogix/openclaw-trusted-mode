@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -35,8 +35,14 @@ liveSdeDescribe('live SDE integration', () => {
   const servers: Array<{ stop: () => Promise<void> }> = [];
   const tempDirs: string[] = [];
 
+  beforeEach(() => {
+    // Keep live suite independent of developer host OpenClaw plugin config.
+    process.env.OPENCLAW_CONFIG_PATH = path.join(os.tmpdir(), `openclaw-live-missing-${Date.now()}.json`);
+  });
+
   // These tests require a locally runnable SDE repo and Python runtime.
   afterEach(async () => {
+    delete process.env.OPENCLAW_CONFIG_PATH;
     while (servers.length > 0) {
       await servers.pop()!.stop();
     }

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import http from 'node:http';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -45,6 +45,12 @@ function startMockPdpServer(
 }
 
 describe('trusted mode plugin', () => {
+  beforeEach(() => {
+    // Isolate unit tests from the developer's real ~/.openclaw/openclaw.json so
+    // host allowedTenantIds/requireTenantId settings do not leak into fixtures.
+    process.env.OPENCLAW_CONFIG_PATH = join(tmpdir(), `openclaw-unit-missing-${Date.now()}.json`);
+  });
+
   afterEach(() => {
     vi.unstubAllGlobals();
     delete process.env.OPENCLAW_CONFIG_PATH;
