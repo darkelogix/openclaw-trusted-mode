@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/%40dexgate%2Fopenclaw-trusted-mode)](https://www.npmjs.com/package/@dexgate/openclaw-trusted-mode)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
-[![CI](https://github.com/darkelogix/openclaw-trusted-mode/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/darkelogix/openclaw-trusted-mode/actions/workflows/ci.yml)
+[![CI](https://github.com/dexgate-ai/openclaw-trusted-mode/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/dexgate-ai/openclaw-trusted-mode/actions/workflows/ci.yml)
 
 Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 

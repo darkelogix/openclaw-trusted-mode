@@ -63,7 +63,7 @@ clawhub package publish . \
   --tags latest \
   --categories security,governance \
   --topics openclaw,trusted-mode,local-hardening,dexgate \
-  --source-repo darkelogix/openclaw-trusted-mode
+  --source-repo dexgate-ai/openclaw-trusted-mode
 ```
 
 Notes:

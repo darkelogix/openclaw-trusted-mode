@@ -1,6 +1,6 @@
 {
   "name": "@dexgate/openclaw-trusted-mode",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "MIT-licensed OpenClaw Trusted Mode plugin with standalone hardening and optional dexgate-backed governance",
   "license": "MIT",
   "main": "dist/index.js",
@@ -14,7 +14,7 @@
   "homepage": "https://dexgate.ai/openclaw/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/darkelogix/openclaw-trusted-mode.git"
+    "url": "git+https://github.com/dexgate-ai/openclaw-trusted-mode.git"
   },
   "bugs": {
     "url": "https://dexgate.ai/contact/"
