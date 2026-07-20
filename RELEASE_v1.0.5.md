@@ -36,7 +36,7 @@ Low functional blast radius. Policy enforcement semantics are unchanged after st
 
 ## 6) Rollback Plan
 
-1. Reinstall `@darkelogix/openclaw-trusted-mode@1.0.4` if the configure helper must be backed out.
+1. Reinstall `@dexgate/openclaw-trusted-mode@1.0.4` if the configure helper must be backed out.
 2. Edit `~/.openclaw/openclaw.json` manually using the documented governed values as a temporary workaround.
 3. Reapply `1.0.5` once the helper validation path succeeds.
 

@@ -32,7 +32,7 @@ No policy-surface expansion. This release only corrects package contents for att
 
 ## 6) Rollback Plan
 
-1. Reinstall `@darkelogix/openclaw-trusted-mode@1.0.2` if needed.
+1. Reinstall `@dexgate/openclaw-trusted-mode@1.0.2` if needed.
 2. Copy attestation pack files into the package root manually only as a temporary workaround.
 3. Reapply `1.0.3` once package verification succeeds.
 

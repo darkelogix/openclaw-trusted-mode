@@ -36,7 +36,7 @@ No policy behavior change. Only the text surfaced after a certification-based bl
 
 ## 6) Rollback Plan
 
-1. Reinstall `@darkelogix/openclaw-trusted-mode@1.0.6` if the messaging change must be backed out.
+1. Reinstall `@dexgate/openclaw-trusted-mode@1.0.6` if the messaging change must be backed out.
 2. Continue using the existing runtime validation path; policy behavior is unchanged either way.
 3. Reapply `1.0.7` once the updated UX text is confirmed.
 

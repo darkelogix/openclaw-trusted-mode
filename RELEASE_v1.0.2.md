@@ -32,7 +32,7 @@ No policy-surface expansion. This release only corrects request context in the p
 
 ## 6) Rollback Plan
 
-1. Reinstall `@darkelogix/openclaw-trusted-mode@1.0.1` if needed.
+1. Reinstall `@dexgate/openclaw-trusted-mode@1.0.1` if needed.
 2. Use manual PDP curl validation while the package is rolled back.
 3. Republish a corrected package before re-enabling customer guidance that depends on runtime-check parity.
 

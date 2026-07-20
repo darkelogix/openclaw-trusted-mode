@@ -36,7 +36,7 @@ Low functional blast radius. Policy semantics remain unchanged after configurati
 
 ## 6) Rollback Plan
 
-1. Reinstall `@darkelogix/openclaw-trusted-mode@1.0.5` if the runtime fallback must be backed out.
+1. Reinstall `@dexgate/openclaw-trusted-mode@1.0.5` if the runtime fallback must be backed out.
 2. Use manual OpenClaw debugging only as a temporary workaround.
 3. Reapply `1.0.6` once gateway startup confirms the governed config is being read correctly.
 

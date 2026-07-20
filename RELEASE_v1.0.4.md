@@ -36,7 +36,7 @@ Low functional blast radius. The plugin enforcement behavior is unchanged; this 
 
 ## 6) Rollback Plan
 
-1. Reinstall `@darkelogix/openclaw-trusted-mode@1.0.3` if package-install troubleshooting requires the prior published build.
+1. Reinstall `@dexgate/openclaw-trusted-mode@1.0.3` if package-install troubleshooting requires the prior published build.
 2. Use a source checkout of the fixed repo only as a temporary workaround.
 3. Reapply `1.0.4` once public npm install validation succeeds.
 
@@ -59,6 +59,6 @@ No measured runtime decision overhead change expected. The release changes packa
 ## 10) Post-Release Monitoring Plan
 
 First 48 hours:
-- confirm `npm install @darkelogix/openclaw-trusted-mode@1.0.4` succeeds on the Windows VM path
+- confirm `npm install @dexgate/openclaw-trusted-mode@1.0.4` succeeds on the Windows VM path
 - confirm `openclaw plugins install` no longer blocks the package on the current CLI safety scan path
 - confirm Guard Pro validation still reaches the expected runtime checks after plugin install

@@ -1,6 +1,6 @@
 {
   "name": "@dexgate/openclaw-trusted-mode",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "MIT-licensed OpenClaw Trusted Mode plugin with standalone hardening and optional dexgate-backed governance",
   "license": "MIT",
   "main": "dist/index.js",
