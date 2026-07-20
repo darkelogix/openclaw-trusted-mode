@@ -4,7 +4,23 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 [![CI](https://github.com/dexgate-ai/openclaw-trusted-mode/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/dexgate-ai/openclaw-trusted-mode/actions/workflows/ci.yml)
 
-Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
+OpenClaw plugin that enforces Trusted Mode policy checks on `before_tool_call`.
+
+## Links
+
+| | |
+|---|---|
+| **Product** | [dexgate.ai](https://dexgate.ai) |
+| **OpenClaw quickstart** | [dexgate.ai/docs/openclaw/quickstart](https://dexgate.ai/docs/openclaw/quickstart/) |
+| **Pricing** | [dexgate.ai/pricing](https://dexgate.ai/pricing/) |
+| **Customer console** | [dexgate.ai/console](https://dexgate.ai/console/) |
+| **GitHub** | [github.com/dexgate-ai/openclaw-trusted-mode](https://github.com/dexgate-ai/openclaw-trusted-mode) |
+| **npm** | [@dexgate/openclaw-trusted-mode](https://www.npmjs.com/package/@dexgate/openclaw-trusted-mode) |
+| **X** | [@dexgateAI](https://x.com/dexgateAI) |
+| **Contact** | [dexgate.ai/contact](https://dexgate.ai/contact/) |
+
+First-time setup in this repo: [`START_HERE.md`](./START_HERE.md).  
+Terminology: [`GLOSSARY.md`](./GLOSSARY.md). Docs index: [`docs/README.md`](./docs/README.md).
 
 ## Acronym Expansions
 
@@ -13,8 +29,18 @@ Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 - `WSL`: Windows Subsystem for Linux
 - `CI`: Continuous Integration
 
-OpenClaw plugin that enforces Trusted Mode policy checks on `before_tool_call`.
-Documentation index (by audience and task): [`docs/README.md`](./docs/README.md).
+## Quick start (free)
+
+```bash
+npm install @dexgate/openclaw-trusted-mode
+# or
+openclaw plugins install npm:@dexgate/openclaw-trusted-mode
+```
+
+Then follow the hosted guide: [OpenClaw quickstart](https://dexgate.ai/docs/openclaw/quickstart/).  
+Repo walkthrough: [`START_HERE.md`](./START_HERE.md).
+
+Install uses the **`latest`** dist-tag only (no separate `pilot` channel).
 
 ## npm Package
 

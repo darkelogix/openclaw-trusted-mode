@@ -604,7 +604,7 @@ With SDE/PDP:
 ## 12) Contact and Escalation
 
 Current metadata:
-- Plugin author field: `Darkelogix`
+- Plugin author field: `Automated Decision Systems, LLC`
 
 Recommended operational contact block (fill in for your org):
 

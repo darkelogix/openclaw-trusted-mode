@@ -1,10 +1,12 @@
 # Start Here: Self-Service Setup
 
+**Product:** [dexgate.ai](https://dexgate.ai) · **Quickstart:** [OpenClaw docs](https://dexgate.ai/docs/openclaw/quickstart/) · **Console:** [dexgate.ai/console](https://dexgate.ai/console/) · **GitHub:** [dexgate-ai/openclaw-trusted-mode](https://github.com/dexgate-ai/openclaw-trusted-mode) · **X:** [@dexgateAI](https://x.com/dexgateAI)
+
 This guide assumes an npm-first customer path:
 
-- install the public adapter/plugin from npm
+- install the public adapter/plugin from npm (`@dexgate/openclaw-trusted-mode`, `latest` only)
 - use standalone mode immediately if you only need local hardening
-- obtain the licensed SDE runtime and deployment materials through the Darkelogix customer console only if you want governed mode
+- obtain the licensed SDE runtime and deployment materials through the **DexGate customer console** ([dexgate.ai/console](https://dexgate.ai/console/)) only if you want governed mode
 
 Terminology and acronyms: [`GLOSSARY.md`](./GLOSSARY.md).
 
@@ -128,7 +130,7 @@ Default free posture:
 
 ## 5) Build and run SDE PDP (Policy Decision Point)
 
-Use this governed path only after you have licensed access to SDE. The supported customer-facing way to obtain the runtime, bundles, and instructions is through the Darkelogix customer console, not by assuming direct source-repo access.
+Use this governed path only after you have licensed access to SDE. The supported customer-facing way to obtain the runtime, bundles, and instructions is through the **DexGate customer console** ([dexgate.ai/console](https://dexgate.ai/console/)), not by assuming direct source-repo access.
 
 
 Use the hardened profile for all production-style and release validation runs.

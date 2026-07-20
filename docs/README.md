@@ -2,6 +2,8 @@
 
 This index organizes release-facing documentation for operators, implementers, and auditors.
 
+**Product:** [dexgate.ai](https://dexgate.ai) · **Hosted quickstart:** [docs/openclaw/quickstart](https://dexgate.ai/docs/openclaw/quickstart/) · **GitHub:** [dexgate-ai/openclaw-trusted-mode](https://github.com/dexgate-ai/openclaw-trusted-mode) · **X:** [@dexgateAI](https://x.com/dexgateAI)
+
 ## Start Here
 
 - First-time setup: [`../START_HERE.md`](../START_HERE.md)
