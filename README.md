@@ -24,6 +24,17 @@ Install the public MIT adapter/plugin package with:
 npm install @dexgate/openclaw-trusted-mode
 ```
 
+## ClawHub discovery
+
+ClawHub is OpenClaw's plugin discovery surface. See [CLAWHUB.md](./CLAWHUB.md).
+
+```bash
+openclaw plugins search "dexgate"
+openclaw plugins install clawhub:@dexgate/openclaw-trusted-mode
+# or npm:
+openclaw plugins install npm:@dexgate/openclaw-trusted-mode
+```
+
 ## What `npm install` gives you
 
 `npm install @dexgate/openclaw-trusted-mode` gives you the MIT adapter/plugin layer and standalone hardening flow only. It does not grant access to the proprietary SDE runtime, enterprise deployment packs, or governed tenant entitlements.
